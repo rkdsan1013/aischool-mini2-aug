@@ -1,0 +1,46 @@
+import { TrendingUp, Coins, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export const Header = () => {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-card/80 backdrop-blur-md border-b border-border shadow-card">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow">
+            <Coins className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">CoinAdvisor</h1>
+            <p className="text-xs text-muted-foreground">Investment Sentiment AI</p>
+          </div>
+        </div>
+
+        <nav className="hidden md:flex items-center space-x-6">
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+            Markets
+          </Button>
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+            News
+          </Button>
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+            Analysis
+          </Button>
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Trending
+          </Button>
+        </nav>
+
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm" className="hidden sm:flex">
+            <User className="w-4 h-4 mr-2" />
+            Login
+          </Button>
+          <Button size="sm" className="bg-gradient-primary hover:bg-primary-hover shadow-glow">
+            Get Started
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+};
