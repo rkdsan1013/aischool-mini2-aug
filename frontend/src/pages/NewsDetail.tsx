@@ -49,11 +49,11 @@ export default function NewsDetail() {
   const getSentimentBadge = (sentiment: string) => {
     switch (sentiment) {
       case 'positive':
-        return <Badge className="bg-success text-success-foreground">Bullish</Badge>;
+        return <Badge className="bg-success text-success-foreground">긍정</Badge>;
       case 'negative':
-        return <Badge className="bg-destructive text-destructive-foreground">Bearish</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">부정</Badge>;
       default:
-        return <Badge variant="secondary">Neutral</Badge>;
+        return <Badge variant="secondary">중립</Badge>;
     }
   };
 
@@ -68,7 +68,7 @@ export default function NewsDetail() {
           className="mb-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to News
+          돌아가기
         </Button>
 
         <div className="max-w-4xl mx-auto">
@@ -108,11 +108,11 @@ export default function NewsDetail() {
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm">
                     <Share2 className="w-4 h-4 mr-2" />
-                    Share
+                    공유
                   </Button>
                   <Button variant="outline" size="sm">
                     <Bookmark className="w-4 h-4 mr-2" />
-                    Save
+                    저장
                   </Button>
                 </div>
               </div>

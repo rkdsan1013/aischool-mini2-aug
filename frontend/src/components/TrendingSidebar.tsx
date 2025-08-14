@@ -19,7 +19,7 @@ const mockTrendingNews: TrendingNews[] = [
     views: '125K',
     comments: 342,
     trend: 'hot',
-    time: '3h ago',
+    time: '3시간 전',
     thumbnail: '/placeholder.svg'
   },
   {
@@ -28,7 +28,7 @@ const mockTrendingNews: TrendingNews[] = [
     views: '89K',
     comments: 156,
     trend: 'up',
-    time: '5h ago',
+    time: '5시간 전',
     thumbnail: '/placeholder.svg'
   },
   {
@@ -37,7 +37,7 @@ const mockTrendingNews: TrendingNews[] = [
     views: '67K',
     comments: 89,
     trend: 'up',
-    time: '7h ago',
+    time: '7시간 전',
     thumbnail: '/placeholder.svg'
   },
   {
@@ -46,7 +46,7 @@ const mockTrendingNews: TrendingNews[] = [
     views: '45K',
     comments: 234,
     trend: 'hot',
-    time: '9h ago',
+    time: '9시간 전',
     thumbnail: '/placeholder.svg'
   }
 ];
@@ -55,15 +55,15 @@ export const TrendingSidebar = () => {
   return (
     <div className="w-80 space-y-6">
       <div className="text-center">
-        <h2 className="text-lg font-bold text-foreground mb-2">Trending Now</h2>
-        <p className="text-sm text-muted-foreground">Most popular crypto stories</p>
+        <h2 className="text-lg font-bold text-foreground mb-2">지금 트렌드</h2>
+        <p className="text-sm text-muted-foreground">가장 인기 있는 암호화폐</p>
       </div>
 
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4 bg-gradient-primary rounded-t-lg">
           <div className="flex items-center space-x-2">
             <Flame className="w-5 h-5 text-primary-foreground" />
-            <h3 className="font-semibold text-primary-foreground">Hot Topics</h3>
+            <h3 className="font-semibold text-primary-foreground">인기 주제</h3>
           </div>
         </div>
         <div className="p-4 space-y-4">
@@ -80,12 +80,12 @@ export const TrendingSidebar = () => {
                     {news.trend === 'hot' ? (
                       <Badge className="bg-destructive text-destructive-foreground">
                         <Flame className="w-3 h-3 mr-1" />
-                        HOT
+                        인기
                       </Badge>
                     ) : (
                       <Badge className="bg-success text-success-foreground">
                         <ArrowUp className="w-3 h-3 mr-1" />
-                        RISING
+                        급상승
                       </Badge>
                     )}
                     <span className="text-xs text-muted-foreground">{news.time}</span>
@@ -112,7 +112,7 @@ export const TrendingSidebar = () => {
 
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4">
-          <h3 className="font-semibold text-foreground mb-3">Market Movers</h3>
+          <h3 className="font-semibold text-foreground mb-3">시장 변동</h3>
           <div className="space-y-3">
             {[
               { name: 'Bitcoin', symbol: 'BTC', change: '+5.2%', color: 'text-success' },

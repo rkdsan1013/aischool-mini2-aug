@@ -16,35 +16,35 @@ const mockSentimentNews: SentimentNews[] = [
     title: 'Bitcoin Breaks $50K Resistance Level',
     sentiment: 'positive',
     impact: 'high',
-    time: '2h ago'
+    time: '2시간 전'
   },
   {
     id: '2',
     title: 'Ethereum ETF Approval Expected',
     sentiment: 'positive',
     impact: 'high',
-    time: '4h ago'
+    time: '4시간 전'
   },
   {
     id: '3',
     title: 'Regulatory Concerns Rise in Asia',
     sentiment: 'negative',
     impact: 'medium',
-    time: '6h ago'
+    time: '6시간 전'
   },
   {
     id: '4',
     title: 'DeFi Protocol TVL Drops 15%',
     sentiment: 'negative',
     impact: 'medium',
-    time: '8h ago'
+    time: '8시간 전'
   },
   {
     id: '5',
     title: 'Major Exchange Adds Staking',
     sentiment: 'positive',
     impact: 'low',
-    time: '12h ago'
+    time: '12시간 전'
   }
 ];
 
@@ -59,6 +59,14 @@ export const SentimentSidebar = () => {
       default: return 'bg-muted text-muted-foreground';
     }
   };
+
+  // const getImpactLabel = (impact: string) => {
+  //   switch (impact) {
+  //     case 'high': return '높음';
+  //     case 'medium': return '중간';
+  //     default: return '낮음';
+  //   }
+  // };
 
   const SentimentSection = ({ 
     title, 
@@ -99,19 +107,19 @@ export const SentimentSidebar = () => {
   return (
     <div className="w-80 space-y-6">
       <div className="text-center">
-        <h2 className="text-lg font-bold text-foreground mb-2">Market Sentiment</h2>
-        <p className="text-sm text-muted-foreground">Live investment sentiment analysis</p>
+        <h2 className="text-lg font-bold text-foreground mb-2">시장 분석</h2>
+        <p className="text-sm text-muted-foreground">실시간 시장 감정 분석</p>
       </div>
 
       <SentimentSection
-        title="Bullish Signals"
+        title="긍정 추세"
         news={positiveNews}
         icon={<TrendingUp className="w-5 h-5" />}
         colorClass="bg-success"
       />
 
       <SentimentSection
-        title="Bearish Signals"
+        title="부정 추세"
         news={negativeNews}
         icon={<TrendingDown className="w-5 h-5" />}
         colorClass="bg-destructive"
@@ -121,12 +129,12 @@ export const SentimentSidebar = () => {
         <div className="p-4 bg-primary rounded-t-lg">
           <div className="flex items-center space-x-2">
             <Activity className="w-5 h-5 text-primary-foreground" />
-            <h3 className="font-semibold text-primary-foreground">Sentiment Score</h3>
+            <h3 className="font-semibold text-primary-foreground">분석 점수</h3>
           </div>
         </div>
         <div className="p-4 text-center">
           <div className="text-3xl font-bold text-success mb-2">+65%</div>
-          <p className="text-sm text-muted-foreground">Overall market sentiment</p>
+          <p className="text-sm text-muted-foreground">전반적인 시장 분석</p>
           <div className="mt-3 w-full bg-muted rounded-full h-2">
             <div className="bg-success h-2 rounded-full" style={{ width: '65%' }}></div>
           </div>

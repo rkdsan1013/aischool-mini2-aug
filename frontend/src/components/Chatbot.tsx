@@ -18,7 +18,7 @@ export const Chatbot = () => {
     {
       id: '1',
       type: 'bot',
-      content: 'Hello! I\'m your AI investment advisor. Ask me about crypto market sentiment, news analysis, or trading insights.',
+      content: '안녕하세요! 저는 여러분의 AI 투자 자문봇입니다. 암호화폐 시장 심리, 뉴스 분석 또는 트레이딩 인사이트에 대해 문의해주세요.',
       timestamp: new Date()
     }
   ]);
@@ -141,7 +141,7 @@ export const Chatbot = () => {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask about market sentiment..."
+            placeholder="메세지를 입력해주세요."
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
             className="flex-1"
           />

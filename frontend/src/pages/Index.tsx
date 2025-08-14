@@ -24,7 +24,7 @@ const mockNews: NewsItem[] = [
     summary: 'Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.',
     thumbnail: cryptoHero,
     sentiment: 'positive',
-    publishedAt: '2 hours ago',
+    publishedAt: '2시간 전',
     source: 'CoinDesk'
   },
   {
@@ -33,7 +33,7 @@ const mockNews: NewsItem[] = [
     summary: 'The latest Ethereum upgrade has resulted in record-breaking staking rewards, attracting more validators to secure the network and earn passive income.',
     thumbnail: cryptoHero,
     sentiment: 'positive',
-    publishedAt: '4 hours ago',
+    publishedAt: '4시간 전',
     source: 'CoinTelegraph'
   },
   {
@@ -42,7 +42,7 @@ const mockNews: NewsItem[] = [
     summary: 'The Securities and Exchange Commission announces new investigation procedures for cryptocurrency projects, raising concerns about potential market impacts.',
     thumbnail: cryptoHero,
     sentiment: 'negative',
-    publishedAt: '6 hours ago',
+    publishedAt: '6시간 전',
     source: 'Bloomberg'
   },
   {
@@ -51,7 +51,7 @@ const mockNews: NewsItem[] = [
     summary: 'Decentralized Finance protocols experience significant outflows as investors become more cautious about yield farming strategies and smart contract risks.',
     thumbnail: cryptoHero,
     sentiment: 'negative',
-    publishedAt: '8 hours ago',
+    publishedAt: '8시간 전',
     source: 'DeFi Pulse'
   },
   {
@@ -60,7 +60,7 @@ const mockNews: NewsItem[] = [
     summary: 'Leading cryptocurrency exchange platform launches comprehensive custody solutions for institutional investors, marking another step toward mainstream adoption.',
     thumbnail: cryptoHero,
     sentiment: 'positive',
-    publishedAt: '12 hours ago',
+    publishedAt: '12시간 전',
     source: 'CoinDesk'
   },
   {
@@ -69,7 +69,7 @@ const mockNews: NewsItem[] = [
     summary: 'The non-fungible token market demonstrates resilience as innovative art collections and utility-focused projects attract renewed investor interest.',
     thumbnail: cryptoHero,
     sentiment: 'neutral',
-    publishedAt: '1 day ago',
+    publishedAt: '1일 전',
     source: 'OpenSea'
   }
 ];
@@ -94,14 +94,14 @@ const Index = () => {
             CoinAdvisor
           </h1>
           <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
-            AI-Powered Cryptocurrency News Analysis & Investment Sentiment Tracking
+            AI 기반 암호화폐 뉴스 분석 및 투자 전략 플랫폼
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-3 bg-white/20 backdrop-blur-sm text-primary-foreground border border-white/30 rounded-lg hover:bg-white/30 transition-all">
-              View Market Analysis
+              시장 분석 보기
             </button>
             <button className="px-8 py-3 bg-white text-primary hover:bg-white/90 rounded-lg transition-all font-medium">
-              Start Free Trial
+              무료 체험 시작하기
             </button>
           </div>
         </div>
@@ -118,8 +118,8 @@ const Index = () => {
           {/* Main News Feed */}
           <div className="flex-1">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Latest Crypto News</h2>
-              <p className="text-muted-foreground">Real-time cryptocurrency news with AI sentiment analysis</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">최근 암호화폐 뉴스</h2>
+              <p className="text-muted-foreground">실시간 암호화폐 뉴스 및 AI 투자 분석</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -135,7 +135,7 @@ const Index = () => {
             {/* Load More */}
             <div className="text-center mt-12">
               <button className="px-8 py-3 bg-gradient-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-all shadow-glow">
-                Load More Articles
+                기사 더 불러오기
               </button>
             </div>
           </div>

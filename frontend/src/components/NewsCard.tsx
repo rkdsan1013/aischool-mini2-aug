@@ -36,11 +36,11 @@ export const NewsCard = ({
   const getSentimentBadge = () => {
     switch (sentiment) {
       case 'positive':
-        return <Badge className="bg-success text-success-foreground">Bullish</Badge>;
+        return <Badge className="bg-success text-success-foreground">긍정</Badge>;
       case 'negative':
-        return <Badge className="bg-destructive text-destructive-foreground">Bearish</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">부정</Badge>;
       default:
-        return <Badge variant="secondary">Neutral</Badge>;
+        return <Badge variant="secondary">중립</Badge>;
     }
   };
 

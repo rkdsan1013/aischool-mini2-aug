@@ -17,27 +17,27 @@ export const Header = () => {
 
         <nav className="hidden md:flex items-center space-x-6">
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-            Markets
+            마켓
           </Button>
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-            News
+            뉴스
           </Button>
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-            Analysis
+            분석
           </Button>
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
             <TrendingUp className="w-4 h-4 mr-2" />
-            Trending
+            트렌드
           </Button>
         </nav>
 
         <div className="flex items-center space-x-3">
           <Button variant="outline" size="sm" className="hidden sm:flex">
             <User className="w-4 h-4 mr-2" />
-            Login
+            로그인
           </Button>
           <Button size="sm" className="bg-gradient-primary hover:bg-primary-hover shadow-glow">
-            Get Started
+            시작하기
           </Button>
         </div>
       </div>
