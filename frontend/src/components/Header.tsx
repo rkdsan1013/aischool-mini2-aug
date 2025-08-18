@@ -11,21 +11,35 @@ export const Header = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">CoinAdvisor</h1>
-            <p className="text-xs text-muted-foreground">Investment Sentiment AI</p>
+            <p className="text-xs text-muted-foreground">
+              Investment Sentiment AI
+            </p>
           </div>
         </div>
 
         <nav className="hidden md:flex items-center space-x-6">
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground"
+          >
             마켓
           </Button>
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground"
+          >
             뉴스
           </Button>
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground"
+          >
             분석
           </Button>
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground"
+          >
             <TrendingUp className="w-4 h-4 mr-2" />
             트렌드
           </Button>
@@ -36,7 +50,10 @@ export const Header = () => {
             <User className="w-4 h-4 mr-2" />
             로그인
           </Button>
-          <Button size="sm" className="bg-gradient-primary hover:bg-primary-hover shadow-glow">
+          <Button
+            size="sm"
+            className="bg-gradient-primary hover:bg-primary-hover shadow-glow"
+          >
             시작하기
           </Button>
         </div>
