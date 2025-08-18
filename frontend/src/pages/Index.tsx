@@ -12,66 +12,72 @@ interface NewsItem {
   title: string;
   summary: string;
   thumbnail: string;
-  sentiment: 'positive' | 'negative' | 'neutral';
+  sentiment: "positive" | "negative" | "neutral";
   publishedAt: string;
   source: string;
 }
 
 const mockNews: NewsItem[] = [
   {
-    id: '1',
-    title: 'Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates',
-    summary: 'Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.',
+    id: "1",
+    title: "Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates",
+    summary:
+      "Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.",
     thumbnail: cryptoHero,
-    sentiment: 'positive',
-    publishedAt: '2시간 전',
-    source: 'CoinDesk'
+    sentiment: "positive",
+    publishedAt: "2시간 전",
+    source: "CoinDesk",
   },
   {
-    id: '2',
-    title: 'Ethereum 2.0 Staking Rewards Reach New All-Time High',
-    summary: 'The latest Ethereum upgrade has resulted in record-breaking staking rewards, attracting more validators to secure the network and earn passive income.',
+    id: "2",
+    title: "Ethereum 2.0 Staking Rewards Reach New All-Time High",
+    summary:
+      "The latest Ethereum upgrade has resulted in record-breaking staking rewards, attracting more validators to secure the network and earn passive income.",
     thumbnail: cryptoHero,
-    sentiment: 'positive',
-    publishedAt: '4시간 전',
-    source: 'CoinTelegraph'
+    sentiment: "positive",
+    publishedAt: "4시간 전",
+    source: "CoinTelegraph",
   },
   {
-    id: '3',
-    title: 'Regulatory Concerns Mount as SEC Increases Crypto Scrutiny',
-    summary: 'The Securities and Exchange Commission announces new investigation procedures for cryptocurrency projects, raising concerns about potential market impacts.',
+    id: "3",
+    title: "Regulatory Concerns Mount as SEC Increases Crypto Scrutiny",
+    summary:
+      "The Securities and Exchange Commission announces new investigation procedures for cryptocurrency projects, raising concerns about potential market impacts.",
     thumbnail: cryptoHero,
-    sentiment: 'negative',
-    publishedAt: '6시간 전',
-    source: 'Bloomberg'
+    sentiment: "negative",
+    publishedAt: "6시간 전",
+    source: "Bloomberg",
   },
   {
-    id: '4',
-    title: 'DeFi Protocol TVL Drops 15% Amid Market Uncertainty',
-    summary: 'Decentralized Finance protocols experience significant outflows as investors become more cautious about yield farming strategies and smart contract risks.',
+    id: "4",
+    title: "DeFi Protocol TVL Drops 15% Amid Market Uncertainty",
+    summary:
+      "Decentralized Finance protocols experience significant outflows as investors become more cautious about yield farming strategies and smart contract risks.",
     thumbnail: cryptoHero,
-    sentiment: 'negative',
-    publishedAt: '8시간 전',
-    source: 'DeFi Pulse'
+    sentiment: "negative",
+    publishedAt: "8시간 전",
+    source: "DeFi Pulse",
   },
   {
-    id: '5',
-    title: 'Major Exchange Announces New Institutional Custody Services',
-    summary: 'Leading cryptocurrency exchange platform launches comprehensive custody solutions for institutional investors, marking another step toward mainstream adoption.',
+    id: "5",
+    title: "Major Exchange Announces New Institutional Custody Services",
+    summary:
+      "Leading cryptocurrency exchange platform launches comprehensive custody solutions for institutional investors, marking another step toward mainstream adoption.",
     thumbnail: cryptoHero,
-    sentiment: 'positive',
-    publishedAt: '12시간 전',
-    source: 'CoinDesk'
+    sentiment: "positive",
+    publishedAt: "12시간 전",
+    source: "CoinDesk",
   },
   {
-    id: '6',
-    title: 'NFT Market Shows Signs of Recovery with New Art Collections',
-    summary: 'The non-fungible token market demonstrates resilience as innovative art collections and utility-focused projects attract renewed investor interest.',
+    id: "6",
+    title: "NFT Market Shows Signs of Recovery with New Art Collections",
+    summary:
+      "The non-fungible token market demonstrates resilience as innovative art collections and utility-focused projects attract renewed investor interest.",
     thumbnail: cryptoHero,
-    sentiment: 'neutral',
-    publishedAt: '1일 전',
-    source: 'OpenSea'
-  }
+    sentiment: "neutral",
+    publishedAt: "1일 전",
+    source: "OpenSea",
+  },
 ];
 
 const Index = () => {
@@ -85,7 +91,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-background">
       <Header />
-      
+
       {/* Hero Section */}
       <div className="relative bg-gradient-primary overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -118,8 +124,12 @@ const Index = () => {
           {/* Main News Feed */}
           <div className="flex-1">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">최근 암호화폐 뉴스</h2>
-              <p className="text-muted-foreground">실시간 암호화폐 뉴스 및 AI 투자 분석</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                최근 암호화폐 뉴스
+              </h2>
+              <p className="text-muted-foreground">
+                실시간 암호화폐 뉴스 및 AI 투자 분석
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
