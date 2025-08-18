@@ -1,5 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, User, Share2, Bookmark } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  User,
+  Share2,
+  Bookmark,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,15 +21,16 @@ interface NewsDetailData {
   author: string;
   publishedAt: string;
   source: string;
-  sentiment: 'positive' | 'negative' | 'neutral';
+  sentiment: "positive" | "negative" | "neutral";
   tags: string[];
 }
 
 // Mock data - in real app this would come from API
 const mockNewsDetail: NewsDetailData = {
-  id: '1',
-  title: 'Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates',
-  summary: 'Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.',
+  id: "1",
+  title: "Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates",
+  summary:
+    "Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.",
   content: `
 In a remarkable display of institutional confidence, Bitcoin has broken through the critical $50,000 resistance level, marking a significant milestone in cryptocurrency adoption. This surge comes as major financial institutions continue to integrate Bitcoin into their portfolios and services.
 
@@ -34,12 +42,12 @@ However, some experts caution about potential volatility ahead. Technical analys
 
 The broader cryptocurrency market has responded positively to Bitcoin's performance, with Ethereum gaining 8% and altcoins showing mixed but generally positive sentiment. DeFi protocols have seen increased activity, suggesting renewed interest in the broader crypto ecosystem.
   `,
-  thumbnail: '/placeholder.svg',
-  author: 'Sarah Chen',
-  publishedAt: '2 hours ago',
-  source: 'CoinDesk',
-  sentiment: 'positive',
-  tags: ['Bitcoin', 'Institutional Adoption', 'Price Analysis', 'ETF']
+  thumbnail: "/placeholder.svg",
+  author: "Sarah Chen",
+  publishedAt: "2 hours ago",
+  source: "CoinDesk",
+  sentiment: "positive",
+  tags: ["Bitcoin", "Institutional Adoption", "Price Analysis", "ETF"],
 };
 
 export default function NewsDetail() {
@@ -48,10 +56,16 @@ export default function NewsDetail() {
 
   const getSentimentBadge = (sentiment: string) => {
     switch (sentiment) {
-      case 'positive':
-        return <Badge className="bg-success text-success-foreground">긍정</Badge>;
-      case 'negative':
-        return <Badge className="bg-destructive text-destructive-foreground">부정</Badge>;
+      case "positive":
+        return (
+          <Badge className="bg-success text-success-foreground">긍정</Badge>
+        );
+      case "negative":
+        return (
+          <Badge className="bg-destructive text-destructive-foreground">
+            부정
+          </Badge>
+        );
       default:
         return <Badge variant="secondary">중립</Badge>;
     }
@@ -60,7 +74,7 @@ export default function NewsDetail() {
   return (
     <div className="min-h-screen bg-gradient-background">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
@@ -75,8 +89,8 @@ export default function NewsDetail() {
           <Card className="bg-gradient-card border-border/50 overflow-hidden">
             {/* Article Header */}
             <div className="relative">
-              <img 
-                src={mockNewsDetail.thumbnail} 
+              <img
+                src={mockNewsDetail.thumbnail}
                 alt={mockNewsDetail.title}
                 className="w-full h-64 object-cover"
               />
@@ -104,8 +118,16 @@ export default function NewsDetail() {
                   </div>
                   <span className="font-medium">{mockNewsDetail.source}</span>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(mockNewsDetail.source, "_blank")}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    원문보기
+                  </Button>
                   <Button variant="outline" size="sm">
                     <Share2 className="w-4 h-4 mr-2" />
                     공유
@@ -121,7 +143,7 @@ export default function NewsDetail() {
               <Card className="bg-primary/10 border-primary/20 p-6 mb-8">
                 <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
                   <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  AI Summary
+                  AI 요약
                 </h2>
                 <p className="text-foreground leading-relaxed">
                   {mockNewsDetail.summary}
@@ -130,18 +152,24 @@ export default function NewsDetail() {
 
               {/* Article Body */}
               <div className="prose prose-lg max-w-none">
-                {mockNewsDetail.content.split('\n\n').map((paragraph, index) => (
-                  paragraph.trim() && (
-                    <p key={index} className="text-foreground leading-relaxed mb-4">
-                      {paragraph.trim()}
-                    </p>
-                  )
-                ))}
+                {mockNewsDetail.content.split("\n\n").map(
+                  (paragraph, index) =>
+                    paragraph.trim() && (
+                      <p
+                        key={index}
+                        className="text-foreground leading-relaxed mb-4"
+                      >
+                        {paragraph.trim()}
+                      </p>
+                    )
+                )}
               </div>
 
               {/* Tags */}
               <div className="mt-8 pt-6 border-t border-border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Tags</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  Tags
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {mockNewsDetail.tags.map((tag) => (
                     <Badge key={tag} variant="secondary">
