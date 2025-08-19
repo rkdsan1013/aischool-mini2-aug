@@ -17,8 +17,26 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# React specific
+coverage/
+build/
+
+# TypeScript specific
+*.tsbuildinfo
+
+# Miscellaneous
+*.lock
+*.cache
+*.tmp
