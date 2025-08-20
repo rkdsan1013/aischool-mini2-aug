@@ -1,12 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Clock,
-  User,
-  Share2,
-  Bookmark,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowLeft, Clock, Share2, Bookmark, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +11,6 @@ interface NewsDetailData {
   summary: string;
   content: string;
   thumbnail: string;
-  author: string;
   publishedAt: string;
   source: string;
   sentiment: "positive" | "negative" | "neutral";
@@ -43,7 +35,6 @@ However, some experts caution about potential volatility ahead. Technical analys
 The broader cryptocurrency market has responded positively to Bitcoin's performance, with Ethereum gaining 8% and altcoins showing mixed but generally positive sentiment. DeFi protocols have seen increased activity, suggesting renewed interest in the broader crypto ecosystem.
   `,
   thumbnail: "/placeholder.svg",
-  author: "Sarah Chen",
   publishedAt: "2 hours ago",
   source: "CoinDesk",
   sentiment: "positive",
@@ -108,15 +99,11 @@ export default function NewsDetail() {
               {/* Meta Information */}
               <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
-                    <span>{mockNewsDetail.author}</span>
-                  </div>
+                  <span className="font-medium">{mockNewsDetail.source}</span>
                   <div className="flex items-center space-x-1">
                     <Clock className="w-4 h-4" />
                     <span>{mockNewsDetail.publishedAt}</span>
                   </div>
-                  <span className="font-medium">{mockNewsDetail.source}</span>
                 </div>
 
                 <div className="flex items-center space-x-2">

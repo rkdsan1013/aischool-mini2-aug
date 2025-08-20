@@ -1,4 +1,4 @@
-import { Flame, Eye, MessageCircle, ArrowUp } from "lucide-react";
+import { Flame, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -6,8 +6,6 @@ interface TrendingNews {
   id: string;
   title: string;
   views: string;
-  comments: number;
-  trend: "up" | "hot";
   time: string;
   thumbnail: string;
 }
@@ -17,8 +15,6 @@ const mockTrendingNews: TrendingNews[] = [
     id: "1",
     title: "AI Predicts Bitcoin Price Movement with 95% Accuracy",
     views: "125K",
-    comments: 342,
-    trend: "hot",
     time: "3시간 전",
     thumbnail: "/placeholder.svg",
   },
@@ -26,8 +22,6 @@ const mockTrendingNews: TrendingNews[] = [
     id: "2",
     title: "Massive Whale Movement Detected in Ethereum",
     views: "89K",
-    comments: 156,
-    trend: "up",
     time: "5시간 전",
     thumbnail: "/placeholder.svg",
   },
@@ -35,8 +29,6 @@ const mockTrendingNews: TrendingNews[] = [
     id: "3",
     title: "New Regulation Could Impact DeFi Protocols",
     views: "67K",
-    comments: 89,
-    trend: "up",
     time: "7시간 전",
     thumbnail: "/placeholder.svg",
   },
@@ -44,11 +36,23 @@ const mockTrendingNews: TrendingNews[] = [
     id: "4",
     title: "Crypto Adoption Rate Hits All-Time High",
     views: "45K",
-    comments: 234,
-    trend: "hot",
     time: "9시간 전",
     thumbnail: "/placeholder.svg",
   },
+];
+
+interface PopularCoin {
+  name: string;
+  symbol: string;
+  mentions: number;
+}
+
+const mockPopularCoins: PopularCoin[] = [
+  { name: "Bitcoin", symbol: "BTC", mentions: 152 },
+  { name: "Ethereum", symbol: "ETH", mentions: 138 },
+  { name: "Ripple", symbol: "XRP", mentions: 97 },
+  { name: "Cardano", symbol: "ADA", mentions: 85 },
+  { name: "Solana", symbol: "SOL", mentions: 80 },
 ];
 
 export const TrendingSidebar = () => {
@@ -56,14 +60,15 @@ export const TrendingSidebar = () => {
     <div className="w-80 space-y-6">
       <div className="text-center">
         <h2 className="text-lg font-bold text-foreground mb-2">지금 트렌드</h2>
-        <p className="text-sm text-muted-foreground">가장 인기 있는 암호화폐</p>
+        <p className="text-sm text-muted-foreground">실시간 인기 정보</p>
       </div>
 
+      {/* 인기 뉴스 */}
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4 bg-gradient-primary rounded-t-lg">
           <div className="flex items-center space-x-2">
             <Flame className="w-5 h-5 text-primary-foreground" />
-            <h3 className="font-semibold text-primary-foreground">인기 주제</h3>
+            <h3 className="font-semibold text-primary-foreground">인기 뉴스</h3>
           </div>
         </div>
         <div className="p-4 space-y-4">
@@ -80,17 +85,9 @@ export const TrendingSidebar = () => {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
-                    {news.trend === "hot" ? (
-                      <Badge className="bg-destructive text-destructive-foreground">
-                        <Flame className="w-3 h-3 mr-1" />
-                        인기
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-success text-success-foreground">
-                        <ArrowUp className="w-3 h-3 mr-1" />
-                        급상승
-                      </Badge>
-                    )}
+                    <Badge className="bg-destructive text-destructive-foreground">
+                      인기
+                    </Badge>
                     <span className="text-xs text-muted-foreground">
                       {news.time}
                     </span>
@@ -103,10 +100,6 @@ export const TrendingSidebar = () => {
                       <Eye className="w-3 h-3" />
                       <span>{news.views}</span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <MessageCircle className="w-3 h-3" />
-                      <span>{news.comments}</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -115,50 +108,26 @@ export const TrendingSidebar = () => {
         </div>
       </Card>
 
+      {/* 인기 종목 */}
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4">
-          <h3 className="font-semibold text-foreground mb-3">시장 변동</h3>
+          <h3 className="font-semibold text-foreground mb-3">인기 종목</h3>
           <div className="space-y-3">
-            {[
-              {
-                name: "Bitcoin",
-                symbol: "BTC",
-                change: "+5.2%",
-                color: "text-success",
-              },
-              {
-                name: "Ethereum",
-                symbol: "ETH",
-                change: "+3.8%",
-                color: "text-success",
-              },
-              {
-                name: "Ripple",
-                symbol: "XRP",
-                change: "-2.1%",
-                color: "text-destructive",
-              },
-              {
-                name: "Cardano",
-                symbol: "ADA",
-                change: "+1.5%",
-                color: "text-success",
-              },
-            ].map((coin) => (
+            {mockPopularCoins.map((coin, index) => (
               <div
                 key={coin.symbol}
                 className="flex items-center justify-between"
               >
                 <div>
                   <span className="font-medium text-foreground">
-                    {coin.name}
+                    {index + 1}. {coin.name}
                   </span>
                   <span className="text-xs text-muted-foreground ml-1">
                     ({coin.symbol})
                   </span>
                 </div>
-                <span className={`font-medium ${coin.color}`}>
-                  {coin.change}
+                <span className="text-sm text-muted-foreground">
+                  {coin.mentions}
                 </span>
               </div>
             ))}

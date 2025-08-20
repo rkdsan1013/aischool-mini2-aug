@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +7,6 @@ interface SentimentNews {
   id: string;
   title: string;
   sentiment: "positive" | "negative";
-  impact: "high" | "medium" | "low";
   time: string;
 }
 
@@ -15,65 +15,73 @@ const mockSentimentNews: SentimentNews[] = [
     id: "1",
     title: "Bitcoin Breaks $50K Resistance Level",
     sentiment: "positive",
-    impact: "high",
     time: "2시간 전",
   },
   {
     id: "2",
     title: "Ethereum ETF Approval Expected",
     sentiment: "positive",
-    impact: "high",
     time: "4시간 전",
   },
   {
     id: "3",
     title: "Regulatory Concerns Rise in Asia",
     sentiment: "negative",
-    impact: "medium",
     time: "6시간 전",
   },
   {
     id: "4",
     title: "DeFi Protocol TVL Drops 15%",
     sentiment: "negative",
-    impact: "medium",
     time: "8시간 전",
   },
   {
     id: "5",
     title: "Major Exchange Adds Staking",
     sentiment: "positive",
-    impact: "low",
     time: "12시간 전",
   },
 ];
 
+interface SentimentStats {
+  positive: number;
+  negative: number;
+  neutral: number;
+}
+
 export const SentimentSidebar = () => {
   const positiveNews = mockSentimentNews.filter(
-    (news) => news.sentiment === "positive"
+    (n) => n.sentiment === "positive"
   );
   const negativeNews = mockSentimentNews.filter(
-    (news) => news.sentiment === "negative"
+    (n) => n.sentiment === "negative"
   );
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "high":
-        return "bg-destructive text-destructive-foreground";
-      case "medium":
-        return "bg-primary text-primary-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
+  const [stats, setStats] = useState<SentimentStats>({
+    positive: 0,
+    negative: 0,
+    neutral: 0,
+  });
+  const [score, setScore] = useState<number>(0);
 
-  // const getImpactLabel = (impact: string) => {
-  //   switch (impact) {
-  //     case 'high': return '높음';
-  //     case 'medium': return '중간';
-  //     default: return '낮음';
-  //   }
-  // };
+  useEffect(() => {
+    // ✅ 실제 서비스에서는 /api/sentiment/stats?range=24h 호출
+    // fetch("/api/sentiment/stats?range=24h")
+    //   .then(res => res.json())
+    //   .then(data => setStats(data));
+
+    const mockStats: SentimentStats = {
+      positive: 65,
+      negative: 25,
+      neutral: 10,
+    };
+    setStats(mockStats);
+
+    const total = mockStats.positive + mockStats.negative + mockStats.neutral;
+    const calcScore =
+      total > 0 ? ((mockStats.positive - mockStats.negative) / total) * 100 : 0;
+    setScore(calcScore);
+  }, []);
 
   const SentimentSection = ({
     title,
@@ -97,8 +105,14 @@ export const SentimentSidebar = () => {
         {news.map((item) => (
           <div key={item.id} className="group cursor-pointer">
             <div className="flex items-start justify-between mb-1">
-              <Badge className={getImpactColor(item.impact)}>
-                {item.impact.toUpperCase()}
+              <Badge
+                className={
+                  item.sentiment === "positive"
+                    ? "bg-success text-success-foreground"
+                    : "bg-destructive text-destructive-foreground"
+                }
+              >
+                {item.sentiment === "positive" ? "긍정" : "부정"}
               </Badge>
               <span className="text-xs text-muted-foreground">{item.time}</span>
             </div>
@@ -132,6 +146,7 @@ export const SentimentSidebar = () => {
         colorClass="bg-destructive"
       />
 
+      {/* 분석 점수 */}
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4 bg-primary rounded-t-lg">
           <div className="flex items-center space-x-2">
@@ -140,12 +155,23 @@ export const SentimentSidebar = () => {
           </div>
         </div>
         <div className="p-4 text-center">
-          <div className="text-3xl font-bold text-success mb-2">+65%</div>
-          <p className="text-sm text-muted-foreground">전반적인 시장 분석</p>
+          <div
+            className={`text-3xl font-bold mb-2 ${
+              score >= 0 ? "text-success" : "text-destructive"
+            }`}
+          >
+            {score >= 0 ? "+" : ""}
+            {score.toFixed(1)}%
+          </div>
+          <p className="text-sm text-muted-foreground">
+            최근 24시간 긍정/부정 비율 기반
+          </p>
           <div className="mt-3 w-full bg-muted rounded-full h-2">
             <div
-              className="bg-success h-2 rounded-full"
-              style={{ width: "65%" }}
+              className={`${
+                score >= 0 ? "bg-success" : "bg-destructive"
+              } h-2 rounded-full`}
+              style={{ width: `${Math.min(Math.abs(score), 100)}%` }}
             ></div>
           </div>
         </div>
