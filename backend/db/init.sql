@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS news (
     tags TEXT[],
     url TEXT,
     embedding VECTOR(768),
+    views BIGINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
