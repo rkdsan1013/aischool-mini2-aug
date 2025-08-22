@@ -7,7 +7,7 @@ interface SentimentNews {
   id: string;
   title: string;
   sentiment: "positive" | "negative";
-  time: string;
+  publishedAt: string;
 }
 
 const mockSentimentNews: SentimentNews[] = [
@@ -15,31 +15,31 @@ const mockSentimentNews: SentimentNews[] = [
     id: "1",
     title: "Bitcoin Breaks $50K Resistance Level",
     sentiment: "positive",
-    time: "2시간 전",
+    publishedAt: "2시간 전",
   },
   {
     id: "2",
     title: "Ethereum ETF Approval Expected",
     sentiment: "positive",
-    time: "4시간 전",
+    publishedAt: "4시간 전",
   },
   {
     id: "3",
     title: "Regulatory Concerns Rise in Asia",
     sentiment: "negative",
-    time: "6시간 전",
+    publishedAt: "6시간 전",
   },
   {
     id: "4",
     title: "DeFi Protocol TVL Drops 15%",
     sentiment: "negative",
-    time: "8시간 전",
+    publishedAt: "8시간 전",
   },
   {
     id: "5",
     title: "Major Exchange Adds Staking",
     sentiment: "positive",
-    time: "12시간 전",
+    publishedAt: "12시간 전",
   },
 ];
 
@@ -114,7 +114,9 @@ export const SentimentSidebar = () => {
               >
                 {item.sentiment === "positive" ? "긍정" : "부정"}
               </Badge>
-              <span className="text-xs text-muted-foreground">{item.time}</span>
+              <span className="text-xs text-muted-foreground">
+                {item.publishedAt}
+              </span>
             </div>
             <p className="text-sm text-foreground group-hover:text-primary transition-colors line-clamp-3">
               {item.title}

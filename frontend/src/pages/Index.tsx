@@ -17,6 +17,7 @@ interface NewsItem {
   source: string;
 }
 
+// 더미 뉴스 데이터 (10개)
 const mockNews: NewsItem[] = [
   {
     id: "1",
@@ -78,15 +79,64 @@ const mockNews: NewsItem[] = [
     publishedAt: "1일 전",
     source: "OpenSea",
   },
+  {
+    id: "7",
+    title: "Layer-2 Networks Hit Record Transactions as Adoption Grows",
+    summary:
+      "Optimistic and zk-rollup based Layer-2 networks see all-time high daily transactions amid lower fees and improved UX.",
+    thumbnail: cryptoHero,
+    sentiment: "positive",
+    publishedAt: "1일 전",
+    source: "The Block",
+  },
+  {
+    id: "8",
+    title: "Stablecoin Regulation Bill Advances in Committee",
+    summary:
+      "A new bill proposing federal oversight for stablecoin issuers moves forward, signaling clearer guardrails for the market.",
+    thumbnail: cryptoHero,
+    sentiment: "neutral",
+    publishedAt: "2일 전",
+    source: "Reuters",
+  },
+  {
+    id: "9",
+    title: "Cross-Chain Bridge Exploit Leads to Multi-Million Dollar Losses",
+    summary:
+      "A critical vulnerability in a popular cross-chain bridge resulted in significant outflows before validators halted transactions.",
+    thumbnail: cryptoHero,
+    sentiment: "negative",
+    publishedAt: "2일 전",
+    source: "Chainalysis",
+  },
+  {
+    id: "10",
+    title: "Bitcoin Halving Countdown Spurs On-Chain Accumulation",
+    summary:
+      "On-chain data shows increased long-term holder accumulation as the halving approaches, potentially reducing sell-side pressure.",
+    thumbnail: cryptoHero,
+    sentiment: "positive",
+    publishedAt: "3일 전",
+    source: "Glassnode",
+  },
 ];
+
+const PAGE_SIZE = 6;
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
 
   const handleNewsClick = (news: NewsItem) => {
     navigate(`/news/${news.id}`);
   };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, mockNews.length));
+  };
+
+  const displayedNews = mockNews.slice(0, visibleCount);
+  const hasMore = visibleCount < mockNews.length;
 
   return (
     <div className="min-h-screen bg-gradient-background">
@@ -133,7 +183,7 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {mockNews.map((news) => (
+              {displayedNews.map((news) => (
                 <NewsCard
                   key={news.id}
                   {...news}
@@ -143,11 +193,16 @@ const Index = () => {
             </div>
 
             {/* Load More */}
-            <div className="text-center mt-12">
-              <button className="px-8 py-3 bg-gradient-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-all shadow-glow">
-                기사 더 불러오기
-              </button>
-            </div>
+            {hasMore && (
+              <div className="text-center mt-12">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-8 py-3 bg-gradient-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-all shadow-glow"
+                >
+                  기사 더 불러오기
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar - Trending */}

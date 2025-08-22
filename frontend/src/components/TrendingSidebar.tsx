@@ -6,7 +6,7 @@ interface TrendingNews {
   id: string;
   title: string;
   views: string;
-  time: string;
+  publishedAt: string;
   thumbnail: string;
 }
 
@@ -15,28 +15,28 @@ const mockTrendingNews: TrendingNews[] = [
     id: "1",
     title: "AI Predicts Bitcoin Price Movement with 95% Accuracy",
     views: "125K",
-    time: "3시간 전",
+    publishedAt: "3시간 전",
     thumbnail: "/placeholder.svg",
   },
   {
     id: "2",
     title: "Massive Whale Movement Detected in Ethereum",
     views: "89K",
-    time: "5시간 전",
+    publishedAt: "5시간 전",
     thumbnail: "/placeholder.svg",
   },
   {
     id: "3",
     title: "New Regulation Could Impact DeFi Protocols",
     views: "67K",
-    time: "7시간 전",
+    publishedAt: "7시간 전",
     thumbnail: "/placeholder.svg",
   },
   {
     id: "4",
     title: "Crypto Adoption Rate Hits All-Time High",
     views: "45K",
-    time: "9시간 전",
+    publishedAt: "9시간 전",
     thumbnail: "/placeholder.svg",
   },
 ];
@@ -89,7 +89,7 @@ export const TrendingSidebar = () => {
                       인기
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {news.time}
+                      {news.publishedAt}
                     </span>
                   </div>
                   <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
