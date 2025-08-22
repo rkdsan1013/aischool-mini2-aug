@@ -1,148 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { NewsCard } from "@/components/NewsCard";
 import { SentimentSidebar } from "@/components/SentimentSidebar";
 import { TrendingSidebar } from "@/components/TrendingSidebar";
 import { Chatbot } from "@/components/Chatbot";
-import cryptoHero from "@/assets/crypto-hero.jpg";
-
-interface NewsItem {
-  id: string;
-  title: string;
-  summary: string;
-  thumbnail: string;
-  sentiment: "positive" | "negative" | "neutral";
-  publishedAt: string;
-  source: string;
-}
-
-// 더미 뉴스 데이터 (10개)
-const mockNews: NewsItem[] = [
-  {
-    id: "1",
-    title: "Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates",
-    summary:
-      "Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.",
-    thumbnail: cryptoHero,
-    sentiment: "positive",
-    publishedAt: "2시간 전",
-    source: "CoinDesk",
-  },
-  {
-    id: "2",
-    title: "Ethereum 2.0 Staking Rewards Reach New All-Time High",
-    summary:
-      "The latest Ethereum upgrade has resulted in record-breaking staking rewards, attracting more validators to secure the network and earn passive income.",
-    thumbnail: cryptoHero,
-    sentiment: "positive",
-    publishedAt: "4시간 전",
-    source: "CoinTelegraph",
-  },
-  {
-    id: "3",
-    title: "Regulatory Concerns Mount as SEC Increases Crypto Scrutiny",
-    summary:
-      "The Securities and Exchange Commission announces new investigation procedures for cryptocurrency projects, raising concerns about potential market impacts.",
-    thumbnail: cryptoHero,
-    sentiment: "negative",
-    publishedAt: "6시간 전",
-    source: "Bloomberg",
-  },
-  {
-    id: "4",
-    title: "DeFi Protocol TVL Drops 15% Amid Market Uncertainty",
-    summary:
-      "Decentralized Finance protocols experience significant outflows as investors become more cautious about yield farming strategies and smart contract risks.",
-    thumbnail: cryptoHero,
-    sentiment: "negative",
-    publishedAt: "8시간 전",
-    source: "DeFi Pulse",
-  },
-  {
-    id: "5",
-    title: "Major Exchange Announces New Institutional Custody Services",
-    summary:
-      "Leading cryptocurrency exchange platform launches comprehensive custody solutions for institutional investors, marking another step toward mainstream adoption.",
-    thumbnail: cryptoHero,
-    sentiment: "positive",
-    publishedAt: "12시간 전",
-    source: "CoinDesk",
-  },
-  {
-    id: "6",
-    title: "NFT Market Shows Signs of Recovery with New Art Collections",
-    summary:
-      "The non-fungible token market demonstrates resilience as innovative art collections and utility-focused projects attract renewed investor interest.",
-    thumbnail: cryptoHero,
-    sentiment: "neutral",
-    publishedAt: "1일 전",
-    source: "OpenSea",
-  },
-  {
-    id: "7",
-    title: "Layer-2 Networks Hit Record Transactions as Adoption Grows",
-    summary:
-      "Optimistic and zk-rollup based Layer-2 networks see all-time high daily transactions amid lower fees and improved UX.",
-    thumbnail: cryptoHero,
-    sentiment: "positive",
-    publishedAt: "1일 전",
-    source: "The Block",
-  },
-  {
-    id: "8",
-    title: "Stablecoin Regulation Bill Advances in Committee",
-    summary:
-      "A new bill proposing federal oversight for stablecoin issuers moves forward, signaling clearer guardrails for the market.",
-    thumbnail: cryptoHero,
-    sentiment: "neutral",
-    publishedAt: "2일 전",
-    source: "Reuters",
-  },
-  {
-    id: "9",
-    title: "Cross-Chain Bridge Exploit Leads to Multi-Million Dollar Losses",
-    summary:
-      "A critical vulnerability in a popular cross-chain bridge resulted in significant outflows before validators halted transactions.",
-    thumbnail: cryptoHero,
-    sentiment: "negative",
-    publishedAt: "2일 전",
-    source: "Chainalysis",
-  },
-  {
-    id: "10",
-    title: "Bitcoin Halving Countdown Spurs On-Chain Accumulation",
-    summary:
-      "On-chain data shows increased long-term holder accumulation as the halving approaches, potentially reducing sell-side pressure.",
-    thumbnail: cryptoHero,
-    sentiment: "positive",
-    publishedAt: "3일 전",
-    source: "Glassnode",
-  },
-];
-
-const PAGE_SIZE = 6;
+import { fetchNewsList, NewsItem } from "@/services/newsService";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchNewsList()
+      .then((data) => {
+        console.log("불러온 뉴스 데이터:", data);
+        setNewsList(data);
+      })
+      .catch((err) => {
+        console.error("뉴스 로딩 실패:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleNewsClick = (news: NewsItem) => {
     navigate(`/news/${news.id}`);
   };
 
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, mockNews.length));
-  };
-
-  const displayedNews = mockNews.slice(0, visibleCount);
-  const hasMore = visibleCount < mockNews.length;
-
   return (
     <div className="min-h-screen bg-gradient-background">
       <Header />
 
-      {/* Hero Section */}
+      {/* Hero */}
       <div className="relative bg-gradient-primary overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative container mx-auto px-4 py-16 text-center">
@@ -163,15 +53,15 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
-          {/* Left Sidebar - Sentiment Analysis */}
+          {/* Left Sidebar */}
           <div className="hidden lg:block">
             <SentimentSidebar />
           </div>
 
-          {/* Main News Feed */}
+          {/* News Feed */}
           <div className="flex-1">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -182,37 +72,28 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {displayedNews.map((news) => (
-                <NewsCard
-                  key={news.id}
-                  {...news}
-                  onClick={() => handleNewsClick(news)}
-                />
-              ))}
-            </div>
-
-            {/* Load More */}
-            {hasMore && (
-              <div className="text-center mt-12">
-                <button
-                  onClick={handleLoadMore}
-                  className="px-8 py-3 bg-gradient-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-all shadow-glow"
-                >
-                  기사 더 불러오기
-                </button>
+            {loading ? (
+              <p>뉴스 불러오는 중...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {newsList.map((news) => (
+                  <NewsCard
+                    key={news.id}
+                    {...news}
+                    onClick={() => handleNewsClick(news)}
+                  />
+                ))}
               </div>
             )}
           </div>
 
-          {/* Right Sidebar - Trending */}
+          {/* Right Sidebar */}
           <div className="hidden lg:block">
             <TrendingSidebar />
           </div>
         </div>
       </div>
 
-      {/* Floating Chatbot */}
       <Chatbot />
     </div>
   );

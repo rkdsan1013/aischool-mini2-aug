@@ -3,10 +3,9 @@ import axios, {
   AxiosResponse,
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
-  AxiosHeaders,
 } from "axios";
 
-// API 에러 응답 인터페이스
+// API 에러 응답 타입
 interface ApiErrorResponse {
   message?: string;
   [key: string]: unknown;
@@ -25,31 +24,22 @@ export class ApiError extends Error {
   }
 }
 
-// Axios 인스턴스 생성
+// Axios 인스턴스
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true,
+  baseURL: "http://localhost:8000", // 환경변수 대신 직접 지정
   timeout: 15_000,
 });
 
-// 요청 인터셉터: 토큰을 AxiosHeaders에 안전하게 추가
+// 요청 인터셉터 (토큰 없음)
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // 기존 헤더를 AxiosHeaders 인스턴스로 래핑
-    const headers = new AxiosHeaders(config.headers);
-    const token = window.localStorage.getItem("token");
-
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-
-    config.headers = headers;
+    // 필요 시 여기서 헤더 추가 가능
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
 );
 
-// 응답 인터셉터: 에러 메시지를 일관된 ApiError로 포장
+// 응답 인터셉터
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
@@ -91,31 +81,29 @@ const request = async <T>(
   return response.data;
 };
 
-// HTTP 메서드 유틸리티
-export const get = <T>(url: string, config?: AxiosRequestConfig): Promise<T> =>
+// HTTP 메서드 유틸
+export const get = <T>(url: string, config?: AxiosRequestConfig) =>
   request<T>("get", url, undefined, config);
 
 export const post = <T>(
   url: string,
   payload?: unknown,
   config?: AxiosRequestConfig
-): Promise<T> => request<T>("post", url, payload, config);
+) => request<T>("post", url, payload, config);
 
 export const put = <T>(
   url: string,
   payload?: unknown,
   config?: AxiosRequestConfig
-): Promise<T> => request<T>("put", url, payload, config);
+) => request<T>("put", url, payload, config);
 
 export const patch = <T>(
   url: string,
   payload?: unknown,
   config?: AxiosRequestConfig
-): Promise<T> => request<T>("patch", url, payload, config);
+) => request<T>("patch", url, payload, config);
 
-export const remove = <T>(
-  url: string,
-  config?: AxiosRequestConfig
-): Promise<T> => request<T>("delete", url, undefined, config);
+export const remove = <T>(url: string, config?: AxiosRequestConfig) =>
+  request<T>("delete", url, undefined, config);
 
 export default axiosInstance;

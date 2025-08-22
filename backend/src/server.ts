@@ -1,30 +1,35 @@
 import express from "express";
-import { Client } from "pg";
+import cors from "cors";
+import { connectDB } from "./config/db";
+import newsRoutes from "./routes/newsRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-const client = new Client({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-client
-  .connect()
-  .then(() => {
-    console.log("✅ Connected to PostgreSQL");
+// ===== CORS 설정 =====
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
-  .catch((err) => {
-    console.error("❌ DB Connection Error", err);
-  });
+);
 
+// ===== JSON 파싱 =====
+app.use(express.json());
+
+// ===== DB 연결 (docker-compose healthcheck + 재시도 로직으로 안정화) =====
+connectDB();
+
+// ===== 기본 라우트 =====
 app.get("/", (req, res) => {
   res.send("Backend API is running!");
 });
 
+// ===== 뉴스 라우트 등록 =====
+app.use("/news", newsRoutes);
+
+// ===== 서버 실행 =====
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
 });
