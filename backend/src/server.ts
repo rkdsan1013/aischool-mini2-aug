@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8000;
 // ===== CORS 설정 =====
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // 프론트엔드 주소
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -18,16 +18,21 @@ app.use(
 // ===== JSON 파싱 =====
 app.use(express.json());
 
-// ===== DB 연결 (docker-compose healthcheck + 재시도 로직으로 안정화) =====
+// ===== DB 연결 =====
 connectDB();
 
 // ===== 기본 라우트 =====
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("Backend API is running!");
 });
 
 // ===== 뉴스 라우트 등록 =====
 app.use("/news", newsRoutes);
+
+// ===== 없는 경로 처리 (404 JSON) =====
+app.use((req, res) => {
+  res.status(404).json({ message: "요청하신 경로를 찾을 수 없습니다." });
+});
 
 // ===== 서버 실행 =====
 app.listen(PORT, () => {

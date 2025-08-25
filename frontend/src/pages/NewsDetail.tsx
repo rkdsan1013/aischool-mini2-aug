@@ -1,12 +1,16 @@
+// src/pages/NewsDetail.tsx
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Clock, Share2, Bookmark, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 
+const API_BASE = import.meta.env.VITE_API_URL!;
+
 interface NewsDetailData {
-  id: string;
+  id: number;
   title: string;
   summary: string;
   content: string;
@@ -15,159 +19,126 @@ interface NewsDetailData {
   source: string;
   sentiment: "positive" | "negative" | "neutral";
   tags: string[];
+  url?: string;
 }
 
-// Mock data - in real app this would come from API
-const mockNewsDetail: NewsDetailData = {
-  id: "1",
-  title: "Bitcoin Surges Past $50,000 as Institutional Adoption Accelerates",
-  summary:
-    "Major financial institutions continue to embrace Bitcoin, driving unprecedented institutional adoption and price momentum beyond the psychological $50,000 resistance level.",
-  content: `
-In a remarkable display of institutional confidence, Bitcoin has broken through the critical $50,000 resistance level, marking a significant milestone in cryptocurrency adoption. This surge comes as major financial institutions continue to integrate Bitcoin into their portfolios and services.
-
-The latest rally was triggered by several key developments in the institutional space. Leading investment firm BlackRock announced an additional $2 billion allocation to Bitcoin, citing it as a hedge against inflation and currency debasement. Meanwhile, MicroStrategy revealed plans to increase their Bitcoin holdings by another $500 million.
-
-Market analysts suggest that this price movement represents more than just speculative trading. The underlying fundamentals show strong institutional demand, with Bitcoin ETF inflows reaching record highs over the past month. On-chain data indicates that long-term holders are accumulating, suggesting confidence in Bitcoin's future prospects.
-
-However, some experts caution about potential volatility ahead. Technical analysis shows that while the breakout is significant, Bitcoin may face resistance around the $52,000-$55,000 range. Traders are advised to monitor key support levels and market sentiment indicators closely.
-
-The broader cryptocurrency market has responded positively to Bitcoin's performance, with Ethereum gaining 8% and altcoins showing mixed but generally positive sentiment. DeFi protocols have seen increased activity, suggesting renewed interest in the broader crypto ecosystem.
-  `,
-  thumbnail: "/placeholder.svg",
-  publishedAt: "2 hours ago",
-  source: "CoinDesk",
-  sentiment: "positive",
-  tags: ["Bitcoin", "Institutional Adoption", "Price Analysis", "ETF"],
-};
-
 export default function NewsDetail() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [news, setNews] = useState<NewsDetailData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const getSentimentBadge = (sentiment: string) => {
-    switch (sentiment) {
-      case "positive":
-        return (
-          <Badge className="bg-success text-success-foreground">긍정</Badge>
-        );
-      case "negative":
-        return (
-          <Badge className="bg-destructive text-destructive-foreground">
-            부정
-          </Badge>
-        );
-      default:
-        return <Badge variant="secondary">중립</Badge>;
-    }
+  useEffect(() => {
+    if (!id) return;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_BASE}/news/${id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: NewsDetailData = await res.json();
+        setNews(data);
+      } catch (err) {
+        console.error("뉴스 상세 불러오기 실패:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id]);
+
+  if (loading) return <div className="p-8 text-center">로딩 중...</div>;
+  if (!news)
+    return <div className="p-8 text-center">뉴스를 불러올 수 없습니다.</div>;
+
+  const getSentimentBadge = (s: string) => {
+    if (s === "positive")
+      return <Badge className="bg-success text-success-foreground">긍정</Badge>;
+    if (s === "negative")
+      return (
+        <Badge className="bg-destructive text-destructive-foreground">
+          부정
+        </Badge>
+      );
+    return <Badge variant="secondary">중립</Badge>;
   };
 
   return (
     <div className="min-h-screen bg-gradient-background">
       <Header />
-
       <div className="container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          돌아가기
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-2" /> 돌아가기
         </Button>
 
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-gradient-card border-border/50 overflow-hidden">
-            {/* Article Header */}
-            <div className="relative">
-              <img
-                src={mockNewsDetail.thumbnail}
-                alt={mockNewsDetail.title}
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute top-4 left-4">
-                {getSentimentBadge(mockNewsDetail.sentiment)}
-              </div>
+        <Card className="bg-gradient-card border-border/50 overflow-hidden max-w-4xl mx-auto">
+          <div className="relative">
+            <img
+              src={news.thumbnail}
+              alt={news.title}
+              className="w-full h-64 object-cover"
+            />
+            <div className="absolute top-4 left-4">
+              {getSentimentBadge(news.sentiment)}
             </div>
+          </div>
 
-            {/* Article Content */}
-            <div className="p-8">
-              <h1 className="text-3xl font-bold text-foreground mb-4">
-                {mockNewsDetail.title}
-              </h1>
-
-              {/* Meta Information */}
-              <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span className="font-medium">{mockNewsDetail.source}</span>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{mockNewsDetail.publishedAt}</span>
-                  </div>
+          <div className="p-8">
+            <h1 className="text-3xl font-bold mb-4">{news.title}</h1>
+            <div className="flex justify-between mb-6 pb-6 border-b">
+              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                <span>{news.source}</span>
+                <div className="flex items-center space-x-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{news.publishedAt}</span>
                 </div>
-
-                <div className="flex items-center space-x-2">
+              </div>
+              <div className="flex items-center space-x-2">
+                {news.url && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open(mockNewsDetail.source, "_blank")}
+                    onClick={() => window.open(news.url, "_blank")}
                   >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    원문보기
+                    <ExternalLink className="w-4 h-4 mr-2" /> 원문보기
                   </Button>
-                  <Button variant="outline" size="sm">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    공유
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Bookmark className="w-4 h-4 mr-2" />
-                    저장
-                  </Button>
-                </div>
-              </div>
-
-              {/* AI Summary */}
-              <Card className="bg-primary/10 border-primary/20 p-6 mb-8">
-                <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  AI 요약
-                </h2>
-                <p className="text-foreground leading-relaxed">
-                  {mockNewsDetail.summary}
-                </p>
-              </Card>
-
-              {/* Article Body */}
-              <div className="prose prose-lg max-w-none">
-                {mockNewsDetail.content.split("\n\n").map(
-                  (paragraph, index) =>
-                    paragraph.trim() && (
-                      <p
-                        key={index}
-                        className="text-foreground leading-relaxed mb-4"
-                      >
-                        {paragraph.trim()}
-                      </p>
-                    )
                 )}
+                <Button variant="outline" size="sm">
+                  <Share2 className="w-4 h-4 mr-2" /> 공유
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Bookmark className="w-4 h-4 mr-2" /> 저장
+                </Button>
               </div>
+            </div>
 
-              {/* Tags */}
-              <div className="mt-8 pt-6 border-t border-border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                  Tags
-                </h3>
+            <Card className="bg-primary/10 border-primary/20 p-6 mb-8">
+              <h2 className="text-lg font-semibold mb-3 flex items-center">
+                <span className="w-2 h-2 bg-primary rounded-full mr-2" /> AI
+                요약
+              </h2>
+              <p>{news.summary}</p>
+            </Card>
+
+            <div className="prose prose-lg max-w-none">
+              {news.content.split("\n\n").map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+
+            {news.tags.length > 0 && (
+              <div className="mt-8 pt-6 border-t">
+                <h3 className="text-sm mb-3 text-muted-foreground">Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {mockNewsDetail.tags.map((tag) => (
+                  {news.tags.map((tag) => (
                     <Badge key={tag} variant="secondary">
                       {tag}
                     </Badge>
                   ))}
                 </div>
               </div>
-            </div>
-          </Card>
-        </div>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );

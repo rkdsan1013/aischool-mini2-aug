@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface NewsCardProps {
-  id: string;
+  id: number; // ✅ 정수 타입으로 변경
   title: string;
   summary: string;
   thumbnail: string;
@@ -52,14 +52,23 @@ export const NewsCard = ({
 
   return (
     <Card
-      className="group cursor-pointer transition-all duration-300 hover:shadow-float hover:-translate-y-1 bg-gradient-card border-border/50"
+      role="button"
+      tabIndex={0}
+      className="group cursor-pointer transition-all duration-300 hover:shadow-float hover:-translate-y-1 bg-gradient-card border-border/50 outline-none focus:ring-2 focus:ring-primary/40"
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
     >
       <div className="relative overflow-hidden rounded-t-lg">
         <img
-          src={thumbnail}
+          src={thumbnail || "/placeholder.svg"}
           alt={title}
           className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
         />
         <div className="absolute top-3 left-3">{getSentimentBadge()}</div>
         <div className="absolute top-3 right-3">{getSentimentIcon()}</div>

@@ -1,47 +1,14 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface SentimentNews {
-  id: string;
+  id: number;
   title: string;
   sentiment: "positive" | "negative";
   publishedAt: string;
 }
-
-const mockSentimentNews: SentimentNews[] = [
-  {
-    id: "1",
-    title: "Bitcoin Breaks $50K Resistance Level",
-    sentiment: "positive",
-    publishedAt: "2시간 전",
-  },
-  {
-    id: "2",
-    title: "Ethereum ETF Approval Expected",
-    sentiment: "positive",
-    publishedAt: "4시간 전",
-  },
-  {
-    id: "3",
-    title: "Regulatory Concerns Rise in Asia",
-    sentiment: "negative",
-    publishedAt: "6시간 전",
-  },
-  {
-    id: "4",
-    title: "DeFi Protocol TVL Drops 15%",
-    sentiment: "negative",
-    publishedAt: "8시간 전",
-  },
-  {
-    id: "5",
-    title: "Major Exchange Adds Staking",
-    sentiment: "positive",
-    publishedAt: "12시간 전",
-  },
-];
 
 interface SentimentStats {
   positive: number;
@@ -49,14 +16,8 @@ interface SentimentStats {
   neutral: number;
 }
 
-export const SentimentSidebar = () => {
-  const positiveNews = mockSentimentNews.filter(
-    (n) => n.sentiment === "positive"
-  );
-  const negativeNews = mockSentimentNews.filter(
-    (n) => n.sentiment === "negative"
-  );
-
+const SentimentSidebar: React.FC = () => {
+  const [news, setNews] = useState<SentimentNews[]>([]);
   const [stats, setStats] = useState<SentimentStats>({
     positive: 0,
     negative: 0,
@@ -65,23 +26,30 @@ export const SentimentSidebar = () => {
   const [score, setScore] = useState<number>(0);
 
   useEffect(() => {
-    // ✅ 실제 서비스에서는 /api/sentiment/stats?range=24h 호출
-    // fetch("/api/sentiment/stats?range=24h")
-    //   .then(res => res.json())
-    //   .then(data => setStats(data));
+    fetch("/api/sentiment/news")
+      .then((res) => res.json())
+      .then((data) => {
+        setNews(data);
+      })
+      .catch(() => setNews([]));
 
-    const mockStats: SentimentStats = {
-      positive: 65,
-      negative: 25,
-      neutral: 10,
-    };
-    setStats(mockStats);
-
-    const total = mockStats.positive + mockStats.negative + mockStats.neutral;
-    const calcScore =
-      total > 0 ? ((mockStats.positive - mockStats.negative) / total) * 100 : 0;
-    setScore(calcScore);
+    fetch("/api/sentiment/stats?range=24h")
+      .then((res) => res.json())
+      .then((data) => {
+        setStats(data);
+        const total = data.positive + data.negative + data.neutral;
+        const calcScore =
+          total > 0 ? ((data.positive - data.negative) / total) * 100 : 0;
+        setScore(calcScore);
+      })
+      .catch(() => {
+        setStats({ positive: 0, negative: 0, neutral: 0 });
+        setScore(0);
+      });
   }, []);
+
+  const positiveNews = news.filter((n) => n.sentiment === "positive");
+  const negativeNews = news.filter((n) => n.sentiment === "negative");
 
   const SentimentSection = ({
     title,
@@ -181,3 +149,5 @@ export const SentimentSidebar = () => {
     </div>
   );
 };
+
+export default SentimentSidebar;

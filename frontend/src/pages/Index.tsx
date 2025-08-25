@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { NewsCard } from "@/components/NewsCard";
-import { SentimentSidebar } from "@/components/SentimentSidebar";
+import SentimentSidebar from "@/components/SentimentSidebar";
 import { TrendingSidebar } from "@/components/TrendingSidebar";
 import { Chatbot } from "@/components/Chatbot";
 import { fetchNewsList, NewsItem } from "@/services/newsService";
@@ -11,8 +11,10 @@ const Index = () => {
   const navigate = useNavigate();
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  const loadNews = () => {
+    setLoading(true);
     fetchNewsList()
       .then((data) => {
         console.log("불러온 뉴스 데이터:", data);
@@ -22,10 +24,30 @@ const Index = () => {
         console.error("뉴스 로딩 실패:", err);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadNews();
   }, []);
 
   const handleNewsClick = (news: NewsItem) => {
     navigate(`/news/${news.id}`);
+  };
+
+  // 🔹 뉴스 갱신 버튼 클릭 핸들러
+  const handleRefreshClick = async () => {
+    try {
+      setRefreshing(true);
+      const res = await fetch("/api/news/fetch", { method: "POST" });
+      if (!res.ok) throw new Error("뉴스 갱신 API 요청 실패");
+      await res.json();
+      alert("뉴스 갱신 완료");
+      await loadNews();
+    } catch (err) {
+      alert("뉴스 갱신 실패");
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
@@ -46,8 +68,13 @@ const Index = () => {
             <button className="px-8 py-3 bg-white/20 backdrop-blur-sm text-primary-foreground border border-white/30 rounded-lg hover:bg-white/30 transition-all">
               시장 분석 보기
             </button>
-            <button className="px-8 py-3 bg-white text-primary hover:bg-white/90 rounded-lg transition-all font-medium">
-              무료 체험 시작하기
+            {/* 🔹 버튼 텍스트 변경 및 이벤트 연결 */}
+            <button
+              onClick={handleRefreshClick}
+              disabled={refreshing}
+              className="px-8 py-3 bg-white text-primary hover:bg-white/90 rounded-lg transition-all font-medium"
+            >
+              {refreshing ? "갱신 중..." : "뉴스 갱신 (개발자모드)"}
             </button>
           </div>
         </div>
