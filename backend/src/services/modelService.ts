@@ -4,39 +4,38 @@ import axios from "axios";
 import http from "http";
 import https from "https";
 
-/**
- * Colab 테스트 셀과 똑같은 환경으로 ngrok HTTP 터널 호출을 재현합니다.
- *
- * 1) process.env.MODEL_BASE_URL 또는 하드코딩된 ngrok URL을 가져와
- *    trim()으로 앞뒤 공백/제어문자 제거, 슬래시(/)를 없앱니다.
- * 2) https:// → http:// 로 치환. Python requests 테스트가 이 HTTP URL을 쓰고
- *    307 리다이렉트를 자동 추종하기 때문에 동일 동작을 합니다.
- */
+//
+// 1) 환경변수 또는 기본 ngrok URL 가져오기
+// 2) https:// → http:// 로 치환, 끝 슬래시 제거
+//
 const RAW_BASE = (
-  process.env.MODEL_BASE_URL ?? "https://45fd69322357.ngrok-free.app"
-)
-  .trim()
-  .replace(/\/+$/, "");
+  process.env.MODEL_BASE_URL?.trim() || "https://45fd69322357.ngrok-free.app"
+).replace(/\/+$/, "");
 
-// Python 테스트셀: http_url = public_url.replace("https://", "http://")
 const BASE_HTTP = RAW_BASE.replace(/^https:\/\//, "http://");
 
-// Python 테스트셀 timeout=(10,1200) 과 동일하게,
-// connect 최대 10초, 총 read 최대 1200초(20분)를 보장하기 위해
-// axios의 단일 timeout을 충분히 크게 설정합니다.
+// Python 테스트셀 timeout=(10,1200) 과 동일
 const MODEL_TIMEOUT_MS = Number(process.env.MODEL_TIMEOUT_MS) || 1_200_000;
 
-// HTTP 터널 전용 에이전트 (verify=False처럼 SSL 인증 무시는 httpsAgent에서)
+// HTTP/HTTPS 에이전트 (SSL 검증 비활성화)
 const httpAgent = new http.Agent();
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 export interface SummarizeResult {
-  title: string; // 모델이 echo 해주는 title
-  summary: string; // 요약 텍스트
-  sentiment: "positive" | "negative" | "neutral"; // 감정 분석 결과
-  embedding: number[]; // 768차원 벡터
+  title: string;
+  summary: string;
+  sentiment: "positive" | "negative" | "neutral";
+  embedding: number[];
 }
 
+export interface EmbeddingResult {
+  embedding: number[];
+}
+
+/**
+ * /summarize: 제목과 본문을 전달해
+ * 요약·감정·임베딩을 반환받습니다.
+ */
 export async function summarizeArticle(
   title: string,
   body: string
@@ -52,22 +51,60 @@ export async function summarizeArticle(
         timeout: MODEL_TIMEOUT_MS,
         httpAgent,
         httpsAgent,
-        // Colab의 requests는 기본적으로 307을 따라가므로
-        // axios도 리다이렉트(307→HTTPS) 5회까지 허용합니다.
         maxRedirects: 5,
       }
     );
 
-    console.log(`[modelService] 응답 상태: ${response.status}`, response.data);
-
+    console.log(
+      `[modelService] summarize status=${response.status}`,
+      response.data
+    );
     if (response.status !== 200) {
       throw new Error(`summarize failed: ${response.status}`);
     }
-
     return response.data;
   } catch (err: any) {
     console.error(
       "[modelService] summarize error:",
+      err.code,
+      err.response?.status,
+      err.message
+    );
+    throw err;
+  }
+}
+
+/**
+ * /embedding: 단일 텍스트를 전달해
+ * embedding 벡터만 반환받습니다.
+ */
+export async function embedText(text: string): Promise<number[]> {
+  const url = `${BASE_HTTP}/embedding`;
+  console.log("[modelService] POST →", url);
+
+  try {
+    const response = await axios.post<EmbeddingResult>(
+      url,
+      { text },
+      {
+        timeout: MODEL_TIMEOUT_MS,
+        httpAgent,
+        httpsAgent,
+        maxRedirects: 5,
+      }
+    );
+
+    console.log(
+      `[modelService] embedding status=${response.status}`,
+      response.data
+    );
+    if (response.status !== 200) {
+      throw new Error(`embedText failed: ${response.status}`);
+    }
+    return response.data.embedding;
+  } catch (err: any) {
+    console.error(
+      "[modelService] embedText error:",
       err.code,
       err.response?.status,
       err.message

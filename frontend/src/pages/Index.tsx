@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+// src/pages/Index.tsx
+
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { NewsCard } from "@/components/NewsCard";
 import SentimentSidebar from "@/components/SentimentSidebar";
 import { TrendingSidebar } from "@/components/TrendingSidebar";
-import { Chatbot } from "@/components/Chatbot";
 import {
   fetchNewsList,
   triggerNewsFetch,
@@ -14,7 +15,7 @@ import {
 
 const ITEMS_PER_PAGE = 6;
 
-const Index = () => {
+const Index: React.FC = () => {
   const navigate = useNavigate();
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +28,7 @@ const Index = () => {
     fetchNewsList()
       .then((data) => {
         setNewsList(data);
-        setPage(1); // 새로 불러올 땐 페이지 리셋
+        setPage(1);
       })
       .catch((err) => console.error("뉴스 로딩 실패:", err))
       .finally(() => setLoading(false));
@@ -70,7 +71,6 @@ const Index = () => {
     }
   };
 
-  // 현재 페이지까지 보여줄 뉴스
   const displayedNews = newsList.slice(0, page * ITEMS_PER_PAGE);
   const hasMore = displayedNews.length < newsList.length;
 
@@ -160,8 +160,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-
-      <Chatbot />
     </div>
   );
 };
