@@ -9,7 +9,7 @@ const CRYPTO_NEWS_API_URL =
   "https://min-api.cryptocompare.com/data/v2/news/?lang=EN";
 
 /** 테스트용: 한 번에 처리할 최대 뉴스 건수 */
-const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 10;
+const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 50;
 
 /** fetchCryptoNews() 반환 타입 */
 export interface NewsItem {
@@ -25,7 +25,7 @@ export interface NewsItem {
 
 /** 1) 외부 API에서 원본 뉴스 가져오기 */
 export async function fetchCryptoNews(): Promise<NewsItem[]> {
-  console.log("[newsService] 1) fetchCryptoNews 시작");
+  console.log("[newsService] fetchCryptoNews 시작");
   const res = await fetch(CRYPTO_NEWS_API_URL);
   if (!res.ok) {
     console.error(`[newsService] fetch 실패 status=${res.status}`);
@@ -48,7 +48,7 @@ export async function fetchCryptoNews(): Promise<NewsItem[]> {
   console.log(`[newsService] 유효 뉴스 개수: ${valid.length}`);
 
   return valid.map((item: any) => ({
-    id: typeof item.id === "string" ? Number(item.id) : (item.id as number),
+    id: typeof item.id === "string" ? Number(item.id) : item.id,
     published_on: item.published_on,
     imageurl: item.imageurl,
     title: item.title,
@@ -59,133 +59,101 @@ export async function fetchCryptoNews(): Promise<NewsItem[]> {
   }));
 }
 
-/** 2) 외부 API → DB 저장 + 모델 분석·업데이트를 하나의 트랜잭션으로 묶음 */
+/** 2) 외부 API → DB 저장 + 모델 분석·업데이트 (건별 트랜잭션) */
 export async function updateCryptoNews(): Promise<void> {
   console.log("▶ updateCryptoNews 시작");
 
-  // 2-1) Fetch
+  // 2-1) Fetch & slice
   const all = await fetchCryptoNews();
   if (all.length === 0) {
     console.log("ℹ️ 새로운 뉴스가 없습니다. 종료");
     return;
   }
-
-  // 2-2) 처리 대상 결정
   const sliceItems = all.slice(0, MAX_NEWS_ITEMS);
   console.log(
     `[newsService] 처리 대상 ID: ${sliceItems.map((i) => i.id).join(", ")}`
   );
 
-  // 2-3) 트랜잭션 BEGIN
-  await client.query("BEGIN");
-  console.log("  ▶ 트랜잭션 BEGIN");
+  // per-item 처리
+  for (const item of sliceItems) {
+    // 각 뉴스별로 개별 트랜잭션 시작
+    await client.query("BEGIN");
+    console.log(`  ▶ [id=${item.id}] 트랜잭션 BEGIN`);
 
-  try {
-    // 3) 기본 정보 upsert
-    console.log("  ▶ 기본 정보 upsert 시작");
-    const insertSql = `
-      INSERT INTO news
-        (id, title, content, thumbnail, published_at, source, tags, url)
-      VALUES
-        ($1, $2, $3, $4, to_timestamp($5), $6, $7, $8)
-      ON CONFLICT (id) DO NOTHING;
-    `;
-    for (const it of sliceItems) {
-      const tagsArr = it.tags
-        ? it.tags
+    try {
+      // A) 기본 정보 upsert
+      const insertSql = `
+        INSERT INTO news
+          (id, title, content, thumbnail, published_at, source, tags, url)
+        VALUES
+          ($1, $2, $3, $4, to_timestamp($5), $6, $7, $8)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+      const tagsArr = item.tags
+        ? item.tags
             .split("|")
             .map((t) => t.trim())
             .filter(Boolean)
         : [];
       await client.query(insertSql, [
-        it.id,
-        it.title,
-        it.body,
-        it.imageurl,
-        it.published_on,
-        it.source_name,
+        item.id,
+        item.title,
+        item.body,
+        item.imageurl,
+        item.published_on,
+        item.source_name,
         tagsArr,
-        it.url,
+        item.url,
       ]);
-      console.log(`    ✔ upsert 완료 id=${it.id}`);
-    }
+      console.log(`    ✔ upsert 완료 id=${item.id}`);
 
-    // 4) 모델 분석 & 상세 업데이트
-    console.log("  ▶ 모델 분석 및 상세 업데이트 시작");
-    const updateSql = `
-      UPDATE news
-         SET title     = $1,
-             summary   = $2,
-             sentiment = $3,
-             embedding = $4::vector
-       WHERE id = $5;
-    `;
-
-    for (const it of sliceItems) {
-      console.log(`    ▶ 모델 호출 id=${it.id}`);
-
-      // 4-1) 모델 호출 시도
-      let aiResult;
-      try {
-        aiResult = await summarizeArticle(it.title, it.body);
-      } catch (e) {
-        console.error(
-          `[newsService] 모델 호출 오류 id=${it.id}:`,
-          (e as Error).message
-        );
-        // 문제 있는 뉴스는 건너뛰고 다음으로
-        continue;
+      // B) 모델 호출 (요약·감정·임베딩)
+      console.log(`    ▶ 모델 호출 id=${item.id}`);
+      const result = await summarizeArticle(item.title, item.body);
+      if ((result as any).error) {
+        throw new Error(`모델 오류: ${(result as any).error}`);
       }
-
-      // 4-2) 모델 내부 에러 표시 확인
-      if ((aiResult as any).error) {
-        console.error(
-          `[newsService] 모델 응답 에러 id=${it.id}:`,
-          (aiResult as any).error
-        );
-        continue;
-      }
-
       console.log(
-        `       ← 모델 응답 summary="${aiResult.summary.slice(
+        `       ← 모델 응답 summary="${result.summary.slice(
           0,
           30
-        )}…" sentiment=${aiResult.sentiment}`
+        )}…" sentiment=${result.sentiment}`
       );
 
-      // 4-3) DB 업데이트 시도
-      try {
-        // [number,number,...] 형태 문자열로 변환
-        const vectorLiteral = `[${aiResult.embedding.join(",")}]`;
-        await client.query(updateSql, [
-          aiResult.title,
-          aiResult.summary,
-          aiResult.sentiment,
-          vectorLiteral,
-          it.id,
-        ]);
-        console.log(`    ✔ 상세 업데이트 완료 id=${it.id}`);
-      } catch (e) {
-        console.error(
-          `[newsService] DB 업데이트 오류 id=${it.id}:`,
-          (e as Error).message
-        );
-        // 이 뉴스만 건너뛰고 계속
-      }
-    }
+      // C) 상세 업데이트
+      const updateSql = `
+        UPDATE news
+           SET title     = $1,
+               summary   = $2,
+               sentiment = $3,
+               embedding = $4::vector
+         WHERE id = $5;
+      `;
+      const vectorLiteral = `[${result.embedding.join(",")}]`;
+      await client.query(updateSql, [
+        result.title,
+        result.summary,
+        result.sentiment,
+        vectorLiteral,
+        item.id,
+      ]);
+      console.log(`    ✔ 상세 업데이트 완료 id=${item.id}`);
 
-    // 5) COMMIT
-    await client.query("COMMIT");
-    console.log("  ▶ 트랜잭션 COMMIT");
-    console.log("✅ 전체 뉴스 업데이트 완료");
-  } catch (err) {
-    console.error("❌ 트랜잭션 에러, ROLLBACK 수행", err);
-    await client.query("ROLLBACK");
-    throw err;
+      // D) 커밋
+      await client.query("COMMIT");
+      console.log(`  ▶ [id=${item.id}] 트랜잭션 COMMIT`);
+    } catch (err) {
+      console.error(`❌ [id=${item.id}] 처리 중 에러, ROLLBACK`, err);
+      await client.query("ROLLBACK");
+      // 다음 뉴스로 계속
+      continue;
+    }
   }
+
+  console.log("✅ 전체 뉴스 업데이트 완료");
 }
 
-/** 3) DB에서 뉴스 목록 조회 (summary/sentiment 포함) */
+/** 3) 뉴스 목록 조회 */
 export async function getNewsList(): Promise<
   {
     id: number;
@@ -223,7 +191,7 @@ export async function getNewsList(): Promise<
   return rows;
 }
 
-/** 4) DB에서 개별 뉴스 상세 조회 */
+/** 4) 개별 뉴스 상세 조회 */
 export async function getNewsDetail(id: number): Promise<{
   id: number;
   title: string;
