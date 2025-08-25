@@ -5,6 +5,7 @@ import {
   getNewsList,
   getNewsDetail,
   deleteAllNews,
+  incrementNewsViews,
 } from "../services/newsService";
 
 const router = Router();
@@ -59,6 +60,8 @@ router.get("/:id", async (req, res) => {
   if (Number.isNaN(id)) return res.status(400).json({ message: "잘못된 ID" });
 
   try {
+    await incrementNewsViews(id);
+
     const detail = await getNewsDetail(id);
     if (!detail)
       return res.status(404).json({ message: "뉴스를 찾을 수 없습니다." });

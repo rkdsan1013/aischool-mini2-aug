@@ -8,6 +8,7 @@ export interface NewsItem {
   sentiment: "positive" | "negative" | "neutral" | null;
   publishedAt: string;
   source: string;
+  views: number;
 }
 
 export interface NewsDetailData {

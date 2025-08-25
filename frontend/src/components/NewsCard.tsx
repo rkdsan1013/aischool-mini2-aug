@@ -1,14 +1,15 @@
 import { Clock, TrendingUp, TrendingDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatDateTime } from "@/utils/formatDate";
 
-interface NewsCardProps {
-  id: number; // ✅ 정수 타입으로 변경
+export interface NewsCardProps {
+  id: number;
   title: string;
   summary: string;
   thumbnail: string;
   sentiment: "positive" | "negative" | "neutral";
-  publishedAt: string;
+  publishedAt: string; // ISO 날짜 문자열
   source: string;
   onClick?: () => void;
 }
@@ -23,38 +24,35 @@ export const NewsCard = ({
   onClick,
 }: NewsCardProps) => {
   const getSentimentIcon = () => {
-    switch (sentiment) {
-      case "positive":
-        return <TrendingUp className="w-4 h-4 text-success" />;
-      case "negative":
-        return <TrendingDown className="w-4 h-4 text-destructive" />;
-      default:
-        return null;
-    }
+    if (sentiment === "positive")
+      return <TrendingUp className="w-4 h-4 text-success" />;
+    if (sentiment === "negative")
+      return <TrendingDown className="w-4 h-4 text-destructive" />;
+    return null;
   };
 
   const getSentimentBadge = () => {
-    switch (sentiment) {
-      case "positive":
-        return (
-          <Badge className="bg-success text-success-foreground">긍정</Badge>
-        );
-      case "negative":
-        return (
-          <Badge className="bg-destructive text-destructive-foreground">
-            부정
-          </Badge>
-        );
-      default:
-        return <Badge variant="secondary">중립</Badge>;
+    if (sentiment === "positive") {
+      return <Badge className="bg-success text-success-foreground">긍정</Badge>;
     }
+    if (sentiment === "negative") {
+      return (
+        <Badge className="bg-destructive text-destructive-foreground">
+          부정
+        </Badge>
+      );
+    }
+    return <Badge variant="secondary">중립</Badge>;
   };
 
   return (
     <Card
       role="button"
       tabIndex={0}
-      className="group cursor-pointer transition-all duration-300 hover:shadow-float hover:-translate-y-1 bg-gradient-card border-border/50 outline-none focus:ring-2 focus:ring-primary/40"
+      className="group cursor-pointer transition-all duration-300 
+                 hover:shadow-float hover:-translate-y-1 
+                 bg-gradient-card border-border/50 outline-none 
+                 focus:ring-2 focus:ring-primary/40"
       onClick={onClick}
       onKeyDown={(e) => {
         if (onClick && (e.key === "Enter" || e.key === " ")) {
@@ -75,7 +73,10 @@ export const NewsCard = ({
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+        <h3
+          className="font-semibold text-foreground mb-2 line-clamp-2
+                       group-hover:text-primary transition-colors"
+        >
           {title}
         </h3>
         <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
@@ -86,7 +87,8 @@ export const NewsCard = ({
           <span className="font-medium">{source}</span>
           <div className="flex items-center space-x-1">
             <Clock className="w-3 h-3" />
-            <span>{publishedAt}</span>
+            {/* 포맷된 날짜/시간 표시 */}
+            <span>{formatDateTime(publishedAt)}</span>
           </div>
         </div>
       </div>

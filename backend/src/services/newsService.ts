@@ -127,6 +127,7 @@ export async function getNewsList(): Promise<
     title: string;
     content: string;
     thumbnail: string;
+    views: number;
     publishedAt: string;
     source: string;
     tags: string[];
@@ -139,6 +140,7 @@ export async function getNewsList(): Promise<
       title,
       content,
       thumbnail,
+      views,
       to_char(published_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "publishedAt",
       source,
       tags,
@@ -185,4 +187,13 @@ export async function getNewsDetail(id: number): Promise<{
  */
 export async function deleteAllNews(): Promise<void> {
   await client.query("DELETE FROM news;");
+}
+
+export async function incrementNewsViews(id: number): Promise<void> {
+  const sql = `
+    UPDATE news
+       SET views = views + 1
+     WHERE id = $1
+  `;
+  await client.query(sql, [id]);
 }

@@ -1,11 +1,22 @@
+// frontend/src/pages/NewsDetail.tsx
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Clock, Share2, Bookmark, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  Share2,
+  Bookmark,
+  ExternalLink,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import { fetchNewsDetail } from "@/services/newsService";
+import { formatDateTime } from "@/utils/formatDate";
 
 interface NewsDetailData {
   id: number;
@@ -14,9 +25,9 @@ interface NewsDetailData {
   thumbnail: string;
   publishedAt: string;
   source: string;
+  sentiment: "positive" | "negative" | "neutral";
   tags: string[];
   url?: string | null;
-  // AI 요약 복원: 백엔드가 비워둘 수 있으므로 optional 처리
   summary?: string | null;
 }
 
@@ -35,17 +46,13 @@ export default function NewsDetail() {
     setError(null);
 
     fetchNewsDetail(Number(id))
-      .then((data) => {
-        setNews(data);
-      })
+      .then((data) => setNews(data))
       .catch((err: unknown) => {
         console.error("뉴스 상세 불러오기 실패:", err);
         if (err instanceof Error) setError(err.message);
         else setError("알 수 없는 오류가 발생했습니다.");
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
@@ -72,6 +79,28 @@ export default function NewsDetail() {
     );
   }
 
+  const getSentimentIcon = () => {
+    if (news.sentiment === "positive")
+      return <TrendingUp className="w-5 h-5 text-success" />;
+    if (news.sentiment === "negative")
+      return <TrendingDown className="w-5 h-5 text-destructive" />;
+    return null;
+  };
+
+  const getSentimentBadge = () => {
+    if (news.sentiment === "positive") {
+      return <Badge className="bg-success text-success-foreground">긍정</Badge>;
+    }
+    if (news.sentiment === "negative") {
+      return (
+        <Badge className="bg-destructive text-destructive-foreground">
+          부정
+        </Badge>
+      );
+    }
+    return <Badge variant="secondary">중립</Badge>;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-background">
       <Header />
@@ -88,6 +117,8 @@ export default function NewsDetail() {
               alt={news.title}
               className="w-full h-64 object-cover"
             />
+            <div className="absolute top-4 left-4">{getSentimentBadge()}</div>
+            <div className="absolute top-4 right-4">{getSentimentIcon()}</div>
           </div>
 
           <div className="p-8">
@@ -98,7 +129,9 @@ export default function NewsDetail() {
                 <span>{news.source}</span>
                 <div className="flex items-center space-x-1">
                   <Clock className="w-4 h-4" />
-                  <span>{news.publishedAt}</span>
+                  <time dateTime={news.publishedAt}>
+                    {formatDateTime(news.publishedAt)}
+                  </time>
                 </div>
               </div>
 
@@ -107,7 +140,7 @@ export default function NewsDetail() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open(news.url as string, "_blank")}
+                    onClick={() => window.open(news.url, "_blank")}
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
                     원문보기
@@ -122,7 +155,6 @@ export default function NewsDetail() {
               </div>
             </div>
 
-            {/* AI 요약 섹션 복원 */}
             <Card className="bg-primary/10 border-primary/20 p-6 mb-8">
               <h2 className="text-lg font-semibold mb-3 flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-2" />

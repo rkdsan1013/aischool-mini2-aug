@@ -1,46 +1,12 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Flame, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { fetchNewsList, NewsItem } from "@/services/newsService";
+import { formatDateTime } from "@/utils/formatDate";
 
-interface TrendingNews {
-  id: string;
-  title: string;
-  views: string;
-  publishedAt: string;
-  thumbnail: string;
-}
-
-const mockTrendingNews: TrendingNews[] = [
-  {
-    id: "1",
-    title: "AI Predicts Bitcoin Price Movement with 95% Accuracy",
-    views: "125K",
-    publishedAt: "3시간 전",
-    thumbnail: "/placeholder.svg",
-  },
-  {
-    id: "2",
-    title: "Massive Whale Movement Detected in Ethereum",
-    views: "89K",
-    publishedAt: "5시간 전",
-    thumbnail: "/placeholder.svg",
-  },
-  {
-    id: "3",
-    title: "New Regulation Could Impact DeFi Protocols",
-    views: "67K",
-    publishedAt: "7시간 전",
-    thumbnail: "/placeholder.svg",
-  },
-  {
-    id: "4",
-    title: "Crypto Adoption Rate Hits All-Time High",
-    views: "45K",
-    publishedAt: "9시간 전",
-    thumbnail: "/placeholder.svg",
-  },
-];
-
+// 하단 인기 종목 더미 데이터
 interface PopularCoin {
   name: string;
   symbol: string;
@@ -55,7 +21,34 @@ const mockPopularCoins: PopularCoin[] = [
   { name: "Solana", symbol: "SOL", mentions: 80 },
 ];
 
+// 숫자를 'K', 'M' 단위로 포맷
+function formatViews(count: number): string {
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
+  if (count >= 1_000) return `${Math.floor(count / 1_000)}K`;
+  return `${count}`;
+}
+
 export const TrendingSidebar = () => {
+  const navigate = useNavigate();
+  const [trending, setTrending] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchNewsList()
+      .then((list) => {
+        // 조회수 내림차순 정렬 → 상위 4개
+        const sorted = [...list].sort(
+          (a, b) => (b.views ?? 0) - (a.views ?? 0)
+        );
+        setTrending(sorted.slice(0, 4));
+      })
+      .catch((err) => {
+        console.error("트렌딩 뉴스 로딩 실패:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="w-80 space-y-6">
       <div className="text-center">
@@ -72,55 +65,65 @@ export const TrendingSidebar = () => {
           </div>
         </div>
         <div className="p-4 space-y-4">
-          {mockTrendingNews.map((news) => (
-            <div
-              key={news.id}
-              className="group cursor-pointer border-b border-border/30 last:border-b-0 pb-4 last:pb-0"
-            >
-              <div className="flex space-x-3">
-                <img
-                  src={news.thumbnail}
-                  alt={news.title}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <Badge className="bg-destructive text-destructive-foreground">
-                      인기
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {news.publishedAt}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
-                    {news.title}
-                  </h4>
-                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <div className="flex items-center space-x-1">
-                      <Eye className="w-3 h-3" />
-                      <span>{news.views}</span>
+          {loading && <p className="text-center text-sm">로딩 중...</p>}
+
+          {!loading &&
+            trending.map((news) => (
+              <div
+                key={news.id}
+                className="group cursor-pointer border-b border-border/30 last:border-b-0 pb-4 last:pb-0"
+                onClick={() => navigate(`/news/${news.id}`)}
+              >
+                <div className="flex space-x-3">
+                  <img
+                    src={news.thumbnail || "/placeholder.svg"}
+                    alt={news.title}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Badge className="bg-destructive text-destructive-foreground">
+                        인기
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDateTime(news.publishedAt)}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                      {news.title}
+                    </h4>
+                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                      <div className="flex items-center space-x-1">
+                        <Eye className="w-3 h-3" />
+                        <span>{formatViews(news.views ?? 0)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+
+          {!loading && trending.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground">
+              표시할 트렌딩 뉴스가 없습니다.
+            </p>
+          )}
         </div>
       </Card>
 
-      {/* 인기 종목 */}
+      {/* 인기 종목 (더미 유지) */}
       <Card className="bg-gradient-card border-border/50">
         <div className="p-4">
           <h3 className="font-semibold text-foreground mb-3">인기 종목</h3>
           <div className="space-y-3">
-            {mockPopularCoins.map((coin, index) => (
+            {mockPopularCoins.map((coin, idx) => (
               <div
                 key={coin.symbol}
                 className="flex items-center justify-between"
               >
                 <div>
                   <span className="font-medium text-foreground">
-                    {index + 1}. {coin.name}
+                    {idx + 1}. {coin.name}
                   </span>
                   <span className="text-xs text-muted-foreground ml-1">
                     ({coin.symbol})
