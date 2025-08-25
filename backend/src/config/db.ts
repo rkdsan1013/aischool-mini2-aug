@@ -1,7 +1,7 @@
 import { Client } from "pg";
 
 export const client = new Client({
-  host: process.env.DB_HOST || "db", // docker-compose service name
+  host: process.env.DB_HOST || "db",
   port: Number(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || "password",
@@ -10,24 +10,22 @@ export const client = new Client({
 
 /**
  * DB 연결 (재시도 로직 포함)
- * @param retries 재시도 횟수
- * @param delay   재시도 간격(ms)
  */
-export const connectDB = async (retries = 5, delay = 5000) => {
-  while (retries) {
+export const connectDB = async (retries = 5, delay = 5000): Promise<void> => {
+  while (retries > 0) {
     try {
       await client.connect();
       console.log("✅ Connected to PostgreSQL");
-      break;
+      return;
     } catch (err) {
       console.error(`❌ DB Connection Error: ${err}`);
       retries -= 1;
-      if (!retries) {
-        console.error("🚨 DB 연결 재시도 횟수 초과. 서버를 종료합니다.");
+      if (retries === 0) {
+        console.error("🚨 DB 연결 재시도 초과. 프로세스를 종료합니다.");
         process.exit(1);
       }
-      console.log(`⏳ ${delay / 1000}초 후 재시도... (남은 횟수: ${retries})`);
-      await new Promise((res) => setTimeout(res, delay));
+      console.log(`⏳ ${delay / 1000}s 후 재시도... (남은 횟수: ${retries})`);
+      await new Promise((r) => setTimeout(r, delay));
     }
   }
 };

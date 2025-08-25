@@ -5,24 +5,25 @@ import { NewsCard } from "@/components/NewsCard";
 import SentimentSidebar from "@/components/SentimentSidebar";
 import { TrendingSidebar } from "@/components/TrendingSidebar";
 import { Chatbot } from "@/components/Chatbot";
-import { fetchNewsList, NewsItem } from "@/services/newsService";
+import {
+  fetchNewsList,
+  triggerNewsFetch,
+  purgeAllNews, // 추가 import
+  NewsItem,
+} from "@/services/newsService";
 
 const Index = () => {
   const navigate = useNavigate();
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [deleting, setDeleting] = useState(false); // 삭제 중 상태
 
   const loadNews = () => {
     setLoading(true);
     fetchNewsList()
-      .then((data) => {
-        console.log("불러온 뉴스 데이터:", data);
-        setNewsList(data);
-      })
-      .catch((err) => {
-        console.error("뉴스 로딩 실패:", err);
-      })
+      .then((data) => setNewsList(data))
+      .catch((err) => console.error("뉴스 로딩 실패:", err))
       .finally(() => setLoading(false));
   };
 
@@ -34,19 +35,33 @@ const Index = () => {
     navigate(`/news/${news.id}`);
   };
 
-  // 🔹 뉴스 갱신 버튼 클릭 핸들러
+  // 뉴스 강제 갱신 (개발자모드)
   const handleRefreshClick = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch("/api/news/fetch", { method: "POST" });
-      if (!res.ok) throw new Error("뉴스 갱신 API 요청 실패");
-      await res.json();
+      await triggerNewsFetch();
       alert("뉴스 갱신 완료");
-      await loadNews();
-    } catch (err) {
+      loadNews();
+    } catch {
       alert("뉴스 갱신 실패");
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  // 뉴스 전체 삭제 (개발자모드)
+  const handleDeleteClick = async () => {
+    if (!window.confirm("모든 뉴스를 정말 삭제하시겠습니까?")) return;
+
+    try {
+      setDeleting(true);
+      await purgeAllNews();
+      alert("모든 뉴스가 삭제되었습니다.");
+      setNewsList([]); // 화면 즉시 빈 리스트로
+    } catch {
+      alert("뉴스 삭제 실패");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -56,7 +71,7 @@ const Index = () => {
 
       {/* Hero */}
       <div className="relative bg-gradient-primary overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground mb-4">
             CoinAdvisor
@@ -65,10 +80,13 @@ const Index = () => {
             AI 기반 암호화폐 뉴스 분석 및 투자 전략 플랫폼
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-3 bg-white/20 backdrop-blur-sm text-primary-foreground border border-white/30 rounded-lg hover:bg-white/30 transition-all">
-              시장 분석 보기
+            <button
+              onClick={handleDeleteClick}
+              disabled={deleting}
+              className="px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+            >
+              {deleting ? "삭제 중..." : "뉴스 삭제 (개발자모드)"}
             </button>
-            {/* 🔹 버튼 텍스트 변경 및 이벤트 연결 */}
             <button
               onClick={handleRefreshClick}
               disabled={refreshing}
@@ -83,12 +101,10 @@ const Index = () => {
       {/* Main */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
-          {/* Left Sidebar */}
           <div className="hidden lg:block">
             <SentimentSidebar />
           </div>
 
-          {/* News Feed */}
           <div className="flex-1">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -114,7 +130,6 @@ const Index = () => {
             )}
           </div>
 
-          {/* Right Sidebar */}
           <div className="hidden lg:block">
             <TrendingSidebar />
           </div>

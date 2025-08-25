@@ -1,75 +1,70 @@
-// backend/src/routes/newsRoutes.ts
 import { Router } from "express";
-import { client } from "../config/db";
-import { fetchCryptoNews } from "../services/newsService";
+import {
+  fetchCryptoNews,
+  updateCryptoNews,
+  getNewsList,
+  getNewsDetail,
+  deleteAllNews,
+} from "../services/newsService";
 
 const router = Router();
 
-// 1) 외부 API 뉴스 수집
+// GET  /news/fetch → 원본 데이터만 반환
 router.get("/fetch", async (_req, res) => {
   try {
     const items = await fetchCryptoNews();
     res.json(items);
   } catch (err) {
-    console.error("❌ /news/fetch API Error:", err);
+    console.error("GET /news/fetch Error:", err);
     res.status(500).json({ message: "외부 뉴스 API 호출 실패" });
   }
 });
 
-// 2) 개별 뉴스 조회 (id는 정수)
-router.get("/:id", async (req, res) => {
-  const idNum = parseInt(req.params.id, 10);
-  if (isNaN(idNum)) {
-    return res.status(400).json({ message: "잘못된 뉴스 ID입니다." });
-  }
-
+// POST /news/fetch → DB 저장 (개발자모드)
+router.post("/fetch", async (_req, res) => {
   try {
-    const result = await client.query(
-      `SELECT
-         id,
-         title,
-         summary,
-         content,
-         thumbnail,
-         sentiment,
-         published_at AS "publishedAt",
-         source,
-         tags,
-         url
-       FROM news
-       WHERE id = $1`,
-      [idNum]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "뉴스를 찾을 수 없습니다." });
-    }
-
-    res.json(result.rows[0]);
+    await updateCryptoNews();
+    res.json({ success: true, message: "뉴스 갱신 완료" });
   } catch (err) {
-    console.error(`❌ /news/${idNum} API Error:`, err);
+    console.error("POST /news/fetch Error:", err);
+    res.status(500).json({ message: "뉴스 저장 실패" });
+  }
+});
+
+// DELETE /news → 모든 뉴스 삭제 (개발자모드)
+router.delete("/", async (_req, res) => {
+  try {
+    await deleteAllNews();
+    res.json({ success: true, message: "모든 뉴스 삭제 완료" });
+  } catch (err) {
+    console.error("DELETE /news Error:", err);
+    res.status(500).json({ message: "뉴스 삭제 실패" });
+  }
+});
+
+// GET  /news → 뉴스 목록 (summary, sentiment 없음)
+router.get("/", async (_req, res) => {
+  try {
+    const list = await getNewsList();
+    res.json(list);
+  } catch (err) {
+    console.error("GET /news Error:", err);
     res.status(500).json({ message: "서버 오류" });
   }
 });
 
-// 3) 전체 뉴스 조회
-router.get("/", async (_req, res) => {
+// GET  /news/:id → 개별 뉴스 상세 (summary, sentiment 없음)
+router.get("/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) return res.status(400).json({ message: "잘못된 ID" });
+
   try {
-    const result = await client.query(
-      `SELECT
-         id,
-         title,
-         summary,
-         thumbnail,
-         sentiment,
-         published_at AS "publishedAt",
-         source
-       FROM news
-       ORDER BY published_at DESC`
-    );
-    res.json(result.rows);
+    const detail = await getNewsDetail(id);
+    if (!detail)
+      return res.status(404).json({ message: "뉴스를 찾을 수 없습니다." });
+    res.json(detail);
   } catch (err) {
-    console.error("❌ /news API Error:", err);
+    console.error(`GET /news/${id} Error:`, err);
     res.status(500).json({ message: "서버 오류" });
   }
 });
