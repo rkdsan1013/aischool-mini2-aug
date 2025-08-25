@@ -76,11 +76,11 @@ export async function updateCryptoNews(): Promise<void> {
     `[newsService] 처리 대상 ID: ${sliceItems.map((i) => i.id).join(", ")}`
   );
 
-  try {
-    // 2-3) 트랜잭션 BEGIN
-    await client.query("BEGIN");
-    console.log("  ▶ 트랜잭션 BEGIN");
+  // 2-3) 트랜잭션 BEGIN
+  await client.query("BEGIN");
+  console.log("  ▶ 트랜잭션 BEGIN");
 
+  try {
     // 3) 기본 정보 upsert
     console.log("  ▶ 기본 정보 upsert 시작");
     const insertSql = `
@@ -120,32 +120,58 @@ export async function updateCryptoNews(): Promise<void> {
              embedding = $4::vector
        WHERE id = $5;
     `;
+
     for (const it of sliceItems) {
       console.log(`    ▶ 모델 호출 id=${it.id}`);
-      const {
-        title: aiTitle,
-        summary,
-        sentiment,
-        embedding,
-      } = await summarizeArticle(it.title, it.body);
+
+      // 4-1) 모델 호출 시도
+      let aiResult;
+      try {
+        aiResult = await summarizeArticle(it.title, it.body);
+      } catch (e) {
+        console.error(
+          `[newsService] 모델 호출 오류 id=${it.id}:`,
+          (e as Error).message
+        );
+        // 문제 있는 뉴스는 건너뛰고 다음으로
+        continue;
+      }
+
+      // 4-2) 모델 내부 에러 표시 확인
+      if ((aiResult as any).error) {
+        console.error(
+          `[newsService] 모델 응답 에러 id=${it.id}:`,
+          (aiResult as any).error
+        );
+        continue;
+      }
+
       console.log(
-        `       ← 모델 응답 summary="${summary.slice(
+        `       ← 모델 응답 summary="${aiResult.summary.slice(
           0,
           30
-        )}…" sentiment=${sentiment}`
+        )}…" sentiment=${aiResult.sentiment}`
       );
 
-      // [number,number,...] 형태 문자열로 변환
-      const vectorLiteral = `[${embedding.join(",")}]`;
-
-      await client.query(updateSql, [
-        aiTitle,
-        summary,
-        sentiment,
-        vectorLiteral,
-        it.id,
-      ]);
-      console.log(`    ✔ 상세 업데이트 완료 id=${it.id}`);
+      // 4-3) DB 업데이트 시도
+      try {
+        // [number,number,...] 형태 문자열로 변환
+        const vectorLiteral = `[${aiResult.embedding.join(",")}]`;
+        await client.query(updateSql, [
+          aiResult.title,
+          aiResult.summary,
+          aiResult.sentiment,
+          vectorLiteral,
+          it.id,
+        ]);
+        console.log(`    ✔ 상세 업데이트 완료 id=${it.id}`);
+      } catch (e) {
+        console.error(
+          `[newsService] DB 업데이트 오류 id=${it.id}:`,
+          (e as Error).message
+        );
+        // 이 뉴스만 건너뛰고 계속
+      }
     }
 
     // 5) COMMIT
@@ -185,7 +211,7 @@ export async function getNewsList(): Promise<
       content,
       thumbnail,
       views,
-      to_char(published_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS "publishedAt",
+      to_char(published_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "publishedAt",
       source,
       tags,
       url
@@ -197,7 +223,7 @@ export async function getNewsList(): Promise<
   return rows;
 }
 
-/** 4) DB에서 개별 뉴스 상세 조회 (summary/sentiment 포함) */
+/** 4) DB에서 개별 뉴스 상세 조회 */
 export async function getNewsDetail(id: number): Promise<{
   id: number;
   title: string;
@@ -221,7 +247,7 @@ export async function getNewsDetail(id: number): Promise<{
       content,
       thumbnail,
       views,
-      to_char(published_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS "publishedAt",
+      to_char(published_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "publishedAt",
       source,
       tags,
       url
