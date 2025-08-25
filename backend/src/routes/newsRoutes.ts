@@ -1,3 +1,5 @@
+// backend/src/routes/newsRoutes.ts
+
 import { Router } from "express";
 import {
   fetchCryptoNews,
@@ -10,7 +12,7 @@ import {
 
 const router = Router();
 
-// GET  /news/fetch → 원본 데이터만 반환
+// GET  /news/fetch → 외부 API에서 원본 뉴스 데이터만 반환
 router.get("/fetch", async (_req, res) => {
   try {
     const items = await fetchCryptoNews();
@@ -21,7 +23,7 @@ router.get("/fetch", async (_req, res) => {
   }
 });
 
-// POST /news/fetch → DB 저장 (개발자모드)
+// POST /news/fetch → DB 저장 + 모델 분석·업데이트 (개발자 모드)
 router.post("/fetch", async (_req, res) => {
   try {
     await updateCryptoNews();
@@ -32,7 +34,7 @@ router.post("/fetch", async (_req, res) => {
   }
 });
 
-// DELETE /news → 모든 뉴스 삭제 (개발자모드)
+// DELETE /news → 모든 뉴스 삭제 (개발자 모드)
 router.delete("/", async (_req, res) => {
   try {
     await deleteAllNews();
@@ -43,7 +45,7 @@ router.delete("/", async (_req, res) => {
   }
 });
 
-// GET  /news → 뉴스 목록 (summary, sentiment 없음)
+// GET  /news → 뉴스 목록 조회 (summary, sentiment 포함)
 router.get("/", async (_req, res) => {
   try {
     const list = await getNewsList();
@@ -54,17 +56,22 @@ router.get("/", async (_req, res) => {
   }
 });
 
-// GET  /news/:id → 개별 뉴스 상세 (summary, sentiment 없음)
+// GET  /news/:id → 개별 뉴스 상세 조회 (summary, sentiment 포함)
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
-  if (Number.isNaN(id)) return res.status(400).json({ message: "잘못된 ID" });
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ message: "잘못된 ID" });
+  }
 
   try {
+    // 조회수 증가
     await incrementNewsViews(id);
 
+    // 상세 데이터 조회
     const detail = await getNewsDetail(id);
-    if (!detail)
+    if (!detail) {
       return res.status(404).json({ message: "뉴스를 찾을 수 없습니다." });
+    }
     res.json(detail);
   } catch (err) {
     console.error(`GET /news/${id} Error:`, err);

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
 import newsRoutes from "./routes/newsRoutes";
+import sentimentRoutes from "./routes/sentimentRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -28,6 +29,7 @@ app.get("/", (_req, res) => {
 
 // 뉴스 관련 라우트
 app.use("/news", newsRoutes);
+app.use("/api/sentiment", sentimentRoutes);
 
 // 404 핸들러
 app.use((_req, res) => {

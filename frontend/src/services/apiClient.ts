@@ -29,11 +29,11 @@ export class ApiError extends Error {
     this.data = data;
   }
 }
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
   baseURL: API_BASE,
-  timeout: 15_000,
+  timeout: 0,
 });
 
 // 요청 인터셉터 (여기에 토큰 등 헤더 추가 가능)
