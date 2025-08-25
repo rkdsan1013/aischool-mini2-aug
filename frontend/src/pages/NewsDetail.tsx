@@ -1,5 +1,3 @@
-// frontend/src/pages/NewsDetail.tsx
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Clock, Share2, Bookmark, ExternalLink } from "lucide-react";

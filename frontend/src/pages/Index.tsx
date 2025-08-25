@@ -8,21 +8,27 @@ import { Chatbot } from "@/components/Chatbot";
 import {
   fetchNewsList,
   triggerNewsFetch,
-  purgeAllNews, // 추가 import
+  purgeAllNews,
   NewsItem,
 } from "@/services/newsService";
+
+const ITEMS_PER_PAGE = 6;
 
 const Index = () => {
   const navigate = useNavigate();
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [deleting, setDeleting] = useState(false); // 삭제 중 상태
+  const [deleting, setDeleting] = useState(false);
+  const [page, setPage] = useState(1);
 
   const loadNews = () => {
     setLoading(true);
     fetchNewsList()
-      .then((data) => setNewsList(data))
+      .then((data) => {
+        setNewsList(data);
+        setPage(1); // 새로 불러올 땐 페이지 리셋
+      })
       .catch((err) => console.error("뉴스 로딩 실패:", err))
       .finally(() => setLoading(false));
   };
@@ -35,10 +41,9 @@ const Index = () => {
     navigate(`/news/${news.id}`);
   };
 
-  // 뉴스 강제 갱신 (개발자모드)
   const handleRefreshClick = async () => {
+    setRefreshing(true);
     try {
-      setRefreshing(true);
       await triggerNewsFetch();
       alert("뉴스 갱신 완료");
       loadNews();
@@ -49,21 +54,25 @@ const Index = () => {
     }
   };
 
-  // 뉴스 전체 삭제 (개발자모드)
   const handleDeleteClick = async () => {
     if (!window.confirm("모든 뉴스를 정말 삭제하시겠습니까?")) return;
 
+    setDeleting(true);
     try {
-      setDeleting(true);
       await purgeAllNews();
       alert("모든 뉴스가 삭제되었습니다.");
-      setNewsList([]); // 화면 즉시 빈 리스트로
+      setNewsList([]);
+      setPage(1);
     } catch {
       alert("뉴스 삭제 실패");
     } finally {
       setDeleting(false);
     }
   };
+
+  // 현재 페이지까지 보여줄 뉴스
+  const displayedNews = newsList.slice(0, page * ITEMS_PER_PAGE);
+  const hasMore = displayedNews.length < newsList.length;
 
   return (
     <div className="min-h-screen bg-gradient-background">
@@ -101,10 +110,12 @@ const Index = () => {
       {/* Main */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
+          {/* Left Sidebar */}
           <div className="hidden lg:block">
             <SentimentSidebar />
           </div>
 
+          {/* News Feed */}
           <div className="flex-1">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -118,18 +129,32 @@ const Index = () => {
             {loading ? (
               <p>뉴스 불러오는 중...</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {newsList.map((news) => (
-                  <NewsCard
-                    key={news.id}
-                    {...news}
-                    onClick={() => handleNewsClick(news)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {displayedNews.map((news) => (
+                    <NewsCard
+                      key={news.id}
+                      {...news}
+                      onClick={() => handleNewsClick(news)}
+                    />
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={() => setPage((p) => p + 1)}
+                      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+                    >
+                      더보기
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
+          {/* Right Sidebar */}
           <div className="hidden lg:block">
             <TrendingSidebar />
           </div>

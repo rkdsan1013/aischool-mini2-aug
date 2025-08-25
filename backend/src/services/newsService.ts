@@ -5,7 +5,7 @@ const CRYPTO_NEWS_API_URL =
   "https://min-api.cryptocompare.com/data/v2/news/?lang=EN";
 
 // 한 번에 처리할 최대 뉴스 건수 (env로 조절 가능)
-const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 50;
+const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 10;
 
 export interface NewsItem {
   id: number;

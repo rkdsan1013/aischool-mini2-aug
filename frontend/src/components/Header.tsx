@@ -1,5 +1,3 @@
-// frontend/src/components/Header.tsx
-
 import { TrendingUp, Coins, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
