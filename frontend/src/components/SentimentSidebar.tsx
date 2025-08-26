@@ -4,69 +4,96 @@ import React, { useEffect, useState, useMemo } from "react";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  fetchSentimentNews,
-  fetchSentimentStats,
-  SentimentNews,
-  SentimentStats,
-} from "@/services/newsService";
+import { fetchNewsList } from "@/services/newsService";
+
+interface NewsWithSentiment {
+  id: number;
+  title: string;
+  publishedAt: string;
+  sentiment: "positive" | "negative" | "neutral" | null;
+}
+
+interface Stats {
+  positive: number;
+  negative: number;
+  neutral: number;
+}
 
 const SentimentSidebar: React.FC = () => {
-  const [news, setNews] = useState<SentimentNews[]>([]);
-  const [stats, setStats] = useState<SentimentStats>({
+  const [news, setNews] = useState<NewsWithSentiment[]>([]);
+  const [stats, setStats] = useState<Stats>({
     positive: 0,
     negative: 0,
     neutral: 0,
   });
   const [score, setScore] = useState<number>(0);
 
+  const computeStatsAndScore = (list: NewsWithSentiment[]) => {
+    const st: Stats = { positive: 0, negative: 0, neutral: 0 };
+    list.forEach((item) => {
+      if (item.sentiment === "positive") st.positive++;
+      else if (item.sentiment === "negative") st.negative++;
+      else st.neutral++;
+    });
+    const total = st.positive + st.negative + st.neutral;
+    const rawScore = total ? ((st.positive - st.negative) / total) * 100 : 0;
+    return { stats: st, score: Math.max(-100, Math.min(100, rawScore)) };
+  };
+
   useEffect(() => {
     (async () => {
-      // 1) 긍정/부정 뉴스 가져오기
       try {
-        const list = await fetchSentimentNews();
-        setNews(list);
+        const list = await fetchNewsList();
+        // 최신순으로 정렬
+        const sorted = list
+          .slice()
+          .sort(
+            (a, b) =>
+              new Date(b.publishedAt).getTime() -
+              new Date(a.publishedAt).getTime()
+          )
+          .map((n) => ({
+            id: n.id,
+            title: n.title,
+            publishedAt: n.publishedAt,
+            sentiment: n.sentiment,
+          }));
+        setNews(sorted);
+
+        // 통계 및 점수 계산
+        const { stats, score } = computeStatsAndScore(sorted);
+        setStats(stats);
+        setScore(score);
       } catch (err) {
-        console.error("감성 뉴스 로드 실패:", err);
+        console.error("뉴스 로드 실패:", err);
         setNews([]);
-      }
-
-      // 2) 감성 통계(24h) 가져오기
-      try {
-        const st = await fetchSentimentStats("24h");
-        setStats(st);
-
-        // 점수 계산: (positive − negative) / total * 100
-        const total = st.positive + st.negative + st.neutral;
-        setScore(total > 0 ? ((st.positive - st.negative) / total) * 100 : 0);
-      } catch (err) {
-        console.error("감성 통계 로드 실패:", err);
         setStats({ positive: 0, negative: 0, neutral: 0 });
         setScore(0);
       }
     })();
   }, []);
 
-  // UI에는 긍정/부정만, 중립 뉴스는 목록에 표시 안함
   const positiveNews = useMemo(
-    () => news.filter((n) => n.sentiment === "positive"),
+    () => news.filter((n) => n.sentiment === "positive").slice(0, 5),
     [news]
   );
   const negativeNews = useMemo(
-    () => news.filter((n) => n.sentiment === "negative"),
+    () => news.filter((n) => n.sentiment === "negative").slice(0, 5),
     [news]
   );
 
-  const SentimentSection = ({
+  type SectionProps = {
+    title: string;
+    items: NewsWithSentiment[];
+    icon: React.ReactNode;
+    colorClass: string;
+  };
+
+  const SentimentSection: React.FC<SectionProps> = ({
     title,
     items,
     icon,
     colorClass,
-  }: {
-    title: string;
-    items: SentimentNews[];
-    icon: React.ReactNode;
-    colorClass: string;
   }) => (
     <Card className="bg-gradient-card border-border/50 mb-6">
       <div className={`p-4 rounded-t-lg ${colorClass}`}>
@@ -92,7 +119,7 @@ const SentimentSidebar: React.FC = () => {
                 {item.sentiment === "positive" ? "긍정" : "부정"}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                {new Date(item.publishedAt).toLocaleString()}
+                {new Date(item.publishedAt).toLocaleString("ko-KR")}
               </span>
             </div>
             <p className="text-sm text-foreground group-hover:text-primary transition-colors line-clamp-3">

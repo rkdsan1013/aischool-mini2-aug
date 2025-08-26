@@ -9,7 +9,7 @@ import https from "https";
 // 2) https:// → http:// 로 치환, 끝 슬래시 제거
 //
 const RAW_BASE = (
-  process.env.MODEL_BASE_URL?.trim() || "https://45fd69322357.ngrok-free.app"
+  process.env.MODEL_BASE_URL?.trim() || "https://03a823d6c968.ngrok-free.app"
 ).replace(/\/+$/, "");
 
 const BASE_HTTP = RAW_BASE.replace(/^https:\/\//, "http://");
