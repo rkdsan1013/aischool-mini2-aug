@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchNewsList } from "@/services/newsService";
+import { useNavigate } from "react-router-dom"; // 추가
 
 interface NewsWithSentiment {
   id: number;
@@ -27,6 +28,8 @@ const SentimentSidebar: React.FC = () => {
     neutral: 0,
   });
   const [score, setScore] = useState<number>(0);
+
+  const navigate = useNavigate(); // 추가
 
   const computeStatsAndScore = (list: NewsWithSentiment[]) => {
     const st: Stats = { positive: 0, negative: 0, neutral: 0 };
@@ -107,7 +110,21 @@ const SentimentSidebar: React.FC = () => {
           <p className="text-sm text-muted-foreground">데이터가 없습니다.</p>
         )}
         {items.map((item) => (
-          <div key={item.id} className="group cursor-pointer">
+          <div
+            key={item.id}
+            className="group cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(`/news/${item.id}`)} // 추가
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigate(`/news/${item.id}`); // 추가
+              }
+            }}
+            aria-label={`${title} - ${item.title}`}
+            title={item.title}
+          >
             <div className="flex items-start justify-between mb-1">
               <Badge
                 className={

@@ -89,19 +89,12 @@ const Index: React.FC = () => {
             AI 기반 암호화폐 뉴스 분석 및 투자 전략 플랫폼
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* 기존 개발자 모드 버튼 제거 */}
             <button
-              onClick={handleDeleteClick}
-              disabled={deleting}
-              className="px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+              className="px-8 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-all font-medium"
+              onClick={() => alert("더미 버튼입니다.")}
             >
-              {deleting ? "삭제 중..." : "뉴스 삭제 (개발자모드)"}
-            </button>
-            <button
-              onClick={handleRefreshClick}
-              disabled={refreshing}
-              className="px-8 py-3 bg-white text-primary hover:bg-white/90 rounded-lg transition-all font-medium"
-            >
-              {refreshing ? "갱신 중..." : "뉴스 갱신 (개발자모드)"}
+              구독하기
             </button>
           </div>
         </div>
