@@ -1,20 +1,12 @@
-// backend/src/services/modelService.ts
-
 import axios from "axios";
 import http from "http";
 import https from "https";
 
-//
-// 1) 환경변수 또는 기본 ngrok URL 가져오기
-// 2) https:// → http:// 로 치환, 끝 슬래시 제거
-//
+// 모델 서버 베이스 URL 설정
 const RAW_BASE = (
-  process.env.MODEL_BASE_URL?.trim() || "https://03a823d6c968.ngrok-free.app"
+  process.env.MODEL_BASE_URL?.trim() || "https://13641040f90f.ngrok-free.app"
 ).replace(/\/+$/, "");
-
 const BASE_HTTP = RAW_BASE.replace(/^https:\/\//, "http://");
-
-// Python 테스트셀 timeout=(10,1200) 과 동일
 const MODEL_TIMEOUT_MS = Number(process.env.MODEL_TIMEOUT_MS) || 1_200_000;
 
 // HTTP/HTTPS 에이전트 (SSL 검증 비활성화)
@@ -32,9 +24,12 @@ export interface EmbeddingResult {
   embedding: number[];
 }
 
+export interface ChatbotResult {
+  response: string;
+}
+
 /**
- * /summarize: 제목과 본문을 전달해
- * 요약·감정·임베딩을 반환받습니다.
+ * /summarize: 제목 + 본문을 보내면 요약·감정·임베딩 반환
  */
 export async function summarizeArticle(
   title: string,
@@ -47,14 +42,8 @@ export async function summarizeArticle(
     const response = await axios.post<SummarizeResult>(
       url,
       { title, body },
-      {
-        timeout: MODEL_TIMEOUT_MS,
-        httpAgent,
-        httpsAgent,
-        maxRedirects: 5,
-      }
+      { timeout: MODEL_TIMEOUT_MS, httpAgent, httpsAgent, maxRedirects: 5 }
     );
-
     console.log(
       `[modelService] summarize status=${response.status}`,
       response.data
@@ -75,8 +64,7 @@ export async function summarizeArticle(
 }
 
 /**
- * /embedding: 단일 텍스트를 전달해
- * embedding 벡터만 반환받습니다.
+ * /embedding: 단일 텍스트를 보내면 임베딩 벡터만 반환
  */
 export async function embedText(text: string): Promise<number[]> {
   const url = `${BASE_HTTP}/embedding`;
@@ -86,14 +74,8 @@ export async function embedText(text: string): Promise<number[]> {
     const response = await axios.post<EmbeddingResult>(
       url,
       { text },
-      {
-        timeout: MODEL_TIMEOUT_MS,
-        httpAgent,
-        httpsAgent,
-        maxRedirects: 5,
-      }
+      { timeout: MODEL_TIMEOUT_MS, httpAgent, httpsAgent, maxRedirects: 5 }
     );
-
     console.log(
       `[modelService] embedding status=${response.status}`,
       response.data
@@ -105,6 +87,41 @@ export async function embedText(text: string): Promise<number[]> {
   } catch (err: any) {
     console.error(
       "[modelService] embedText error:",
+      err.code,
+      err.response?.status,
+      err.message
+    );
+    throw err;
+  }
+}
+
+/**
+ * /chatbot: 질문 + 컨텍스트를 보내면 AI 응답 반환
+ */
+export async function chatWithContext(
+  question: string,
+  context: string
+): Promise<ChatbotResult> {
+  const url = `${BASE_HTTP}/chatbot`;
+  console.log("[modelService] POST →", url);
+
+  try {
+    const response = await axios.post<ChatbotResult>(
+      url,
+      { question, context },
+      { timeout: MODEL_TIMEOUT_MS, httpAgent, httpsAgent, maxRedirects: 5 }
+    );
+    console.log(
+      `[modelService] chatWithContext status=${response.status}`,
+      response.data
+    );
+    if (response.status !== 200) {
+      throw new Error(`chatWithContext failed: ${response.status}`);
+    }
+    return response.data;
+  } catch (err: any) {
+    console.error(
+      "[modelService] chatWithContext error:",
       err.code,
       err.response?.status,
       err.message

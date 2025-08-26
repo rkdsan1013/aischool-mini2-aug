@@ -28,15 +28,11 @@ export const Chatbot: React.FC = () => {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
-  // 끝 요소에 스크롤하기 위한 ref
   const endRef = useRef<HTMLDivElement>(null);
 
-  // 새 메시지 추가될 때마다 스크롤을 끝으로 이동
+  // 새로운 메시지가 생기면 자동 스크롤
   useEffect(() => {
-    if (endRef.current) {
-      endRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
   const formatTime = (date: Date) =>
@@ -46,7 +42,7 @@ export const Chatbot: React.FC = () => {
     const question = inputValue.trim();
     if (!question) return;
 
-    // 사용자 메시지 추가
+    // 1) 사용자 메시지 표시
     const userMsg: Message = {
       id: Date.now().toString(),
       type: "user",
@@ -57,9 +53,13 @@ export const Chatbot: React.FC = () => {
     setInputValue("");
     setIsTyping(true);
 
-    // 백엔드로 전송
     try {
-      const { answer } = await sendChat(question);
+      // 2) sendChat 호출 → answer 필드를 꺼내 씁니다.
+      const { answer, context } = await sendChat(question);
+      console.log("💬 Chatbot 응답:", answer);
+      console.log("📚 사용된 컨텍스트:", context);
+
+      // 3) 봇 메시지 표시
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: "bot",
@@ -178,7 +178,7 @@ export const Chatbot: React.FC = () => {
             </div>
           )}
 
-          {/* 메시지 끝으로 스크롤 */}
+          {/* 메시지 끝 요소 */}
           <div ref={endRef} />
         </div>
       </ScrollArea>
@@ -189,7 +189,7 @@ export const Chatbot: React.FC = () => {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="메세지를 입력해주세요."
+            placeholder="메시지를 입력해주세요."
             onKeyPress={(e) => e.key === "Enter" && !isTyping && handleSend()}
             className="flex-1"
           />
