@@ -147,8 +147,8 @@ export const Chatbot: React.FC = () => {
                     <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   )}
                   <div className="flex-1">
-                    <p className="text-sm">{msg.content}</p>
-                    <span className="text-xs opacity-70 mt-1 block">
+                    <p className="text-[14px]">{msg.content}</p>
+                    <span className="text-[12px] opacity-70 mt-1 block">
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>

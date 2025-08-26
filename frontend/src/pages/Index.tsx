@@ -71,7 +71,7 @@ const Index: React.FC = () => {
     }
   };
 
-  const displayedNews = newsList.slice(0, page * ITEMS_PER_PAGE);
+  const displayedNews = newsList.slice(0, 1 + page * ITEMS_PER_PAGE);
   const hasMore = displayedNews.length < newsList.length;
 
   return (
@@ -91,10 +91,16 @@ const Index: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* 기존 개발자 모드 버튼 제거 */}
             <button
-              className="px-8 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-all font-medium"
-              onClick={() => alert("더미 버튼입니다.")}
+              className="px-8 py-3 bg-white/20 text-secondary-foreground rounded-md transition-all font-medium"
+              onClick={() => alert("West River Mountain")}
             >
-              구독하기
+              시장 분석 보기
+            </button>
+            <button
+              className="px-8 py-3 bg-white text-primary rounded-md transition-all font-medium"
+              onClick={() => alert("West River Mountain")}
+            >
+              무료 체험 시작하기
             </button>
           </div>
         </div>
@@ -111,7 +117,7 @@ const Index: React.FC = () => {
           {/* News Feed */}
           <div className="flex-1">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">
+              <h2 className="text-[21px] font-bold text-foreground mb-2">
                 최근 암호화폐 뉴스
               </h2>
               <p className="text-muted-foreground">
@@ -123,8 +129,18 @@ const Index: React.FC = () => {
               <p>뉴스 불러오는 중...</p>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {displayedNews.map((news) => (
+                {/* Featured News Card */}
+                <div className="mb-8">
+                  <NewsCard
+                    key={displayedNews[0].id}
+                    {...displayedNews[0]}
+                    onClick={() => handleNewsClick(displayedNews[0])}
+                  />
+                </div>
+
+                {/* Other News Cards in 3 columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {displayedNews.slice(1).map((news) => (
                     <NewsCard
                       key={news.id}
                       {...news}

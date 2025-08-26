@@ -54,9 +54,9 @@ export const Header = () => {
           </Button>
           <Button
             size="sm"
-            className="bg-gradient-primary hover:bg-primary-hover shadow-glow"
+            className="bg-gradient-primary bg-black hover:bg-primary-hover shadow-glow"
           >
-            시작하기
+            구독하기
           </Button>
         </div>
       </div>

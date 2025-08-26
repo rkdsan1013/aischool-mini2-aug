@@ -99,7 +99,7 @@ const SentimentSidebar: React.FC = () => {
     colorClass,
   }) => (
     <Card className="bg-gradient-card border-border/50 mb-6">
-      <div className={`p-4 rounded-t-lg ${colorClass}`}>
+      <div className={`p-4 rounded-t-md ${colorClass}`}>
         <div className="flex items-center space-x-2">
           {icon}
           <h3 className="font-semibold text-white">{title}</h3>
@@ -139,7 +139,7 @@ const SentimentSidebar: React.FC = () => {
                 {new Date(item.publishedAt).toLocaleString("ko-KR")}
               </span>
             </div>
-            <p className="text-sm text-foreground group-hover:text-primary transition-colors line-clamp-3">
+            <p className="text-[12px] text-foreground group-hover:text-primary transition-colors line-clamp-3">
               {item.title}
             </p>
           </div>
@@ -149,7 +149,7 @@ const SentimentSidebar: React.FC = () => {
   );
 
   return (
-    <div className="w-80 space-y-6">
+    <div className="w-[300px] space-y-6">
       <div className="text-center">
         <h2 className="text-lg font-bold text-foreground mb-2">시장 분석</h2>
         <p className="text-sm text-muted-foreground">실시간 시장 감정 분석</p>
@@ -170,7 +170,7 @@ const SentimentSidebar: React.FC = () => {
       />
 
       <Card className="bg-gradient-card border-border/50">
-        <div className="p-4 bg-primary rounded-t-lg">
+        <div className="p-4 bg-primary rounded-t-md">
           <div className="flex items-center space-x-2">
             <Activity className="w-5 h-5 text-primary-foreground" />
             <h3 className="font-semibold text-primary-foreground">분석 점수</h3>
@@ -178,7 +178,7 @@ const SentimentSidebar: React.FC = () => {
         </div>
         <div className="p-4 text-center">
           <div
-            className={`text-3xl font-bold mb-2 ${
+            className={`text-2xl font-bold mb-2 ${
               score >= 0 ? "text-success" : "text-destructive"
             }`}
           >

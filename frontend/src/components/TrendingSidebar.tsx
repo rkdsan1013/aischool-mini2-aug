@@ -50,7 +50,7 @@ export const TrendingSidebar = () => {
   }, []);
 
   return (
-    <div className="w-80 space-y-6">
+    <div className="w-[300px] space-y-6">
       <div className="text-center">
         <h2 className="text-lg font-bold text-foreground mb-2">지금 트렌드</h2>
         <p className="text-sm text-muted-foreground">실시간 인기 정보</p>
@@ -58,7 +58,7 @@ export const TrendingSidebar = () => {
 
       {/* 인기 뉴스 */}
       <Card className="bg-gradient-card border-border/50">
-        <div className="p-4 bg-gradient-primary rounded-t-lg">
+        <div className="p-4 bg-gradient-primary rounded-t-md">
           <div className="flex items-center space-x-2">
             <Flame className="w-5 h-5 text-primary-foreground" />
             <h3 className="font-semibold text-primary-foreground">인기 뉴스</h3>
@@ -78,7 +78,7 @@ export const TrendingSidebar = () => {
                   <img
                     src={news.thumbnail || "/placeholder.svg"}
                     alt={news.title}
-                    className="w-16 h-16 rounded-lg object-cover"
+                    className="w-16 h-16 rounded-md object-cover"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
@@ -89,7 +89,7 @@ export const TrendingSidebar = () => {
                         {formatDateTime(news.publishedAt)}
                       </span>
                     </div>
-                    <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                    <h4 className="text-[12px] font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
                       {news.title}
                     </h4>
                     <div className="flex items-center space-x-4 text-xs text-muted-foreground">

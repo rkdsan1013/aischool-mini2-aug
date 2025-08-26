@@ -122,7 +122,7 @@ export default function NewsDetail() {
           </div>
 
           <div className="p-8">
-            <h1 className="text-3xl font-bold mb-4">{news.title}</h1>
+            <h1 className="text-[24px] font-bold mb-4">{news.title}</h1>
 
             <div className="flex justify-between mb-6 pb-6 border-b">
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">

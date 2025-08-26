@@ -61,11 +61,11 @@ export const NewsCard = ({
         }
       }}
     >
-      <div className="relative overflow-hidden rounded-t-lg">
+      <div className="relative overflow-hidden rounded-t-sm">
         <img
           src={thumbnail || "/placeholder.svg"}
           alt={title}
-          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-20 object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
         <div className="absolute top-3 left-3">{getSentimentBadge()}</div>
@@ -74,16 +74,16 @@ export const NewsCard = ({
 
       <div className="p-4">
         <h3
-          className="font-semibold text-foreground mb-2 line-clamp-2
+          className="text-[13px] font-semibold text-foreground mb-2 line-clamp-1
                        group-hover:text-primary transition-colors"
         >
           {title}
         </h3>
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
+        <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2">
           {summary}
         </p>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <span className="font-medium">{source}</span>
           <div className="flex items-center space-x-1">
             <Clock className="w-3 h-3" />
