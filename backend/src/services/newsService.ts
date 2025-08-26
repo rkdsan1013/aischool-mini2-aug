@@ -9,7 +9,7 @@ const CRYPTO_NEWS_API_URL =
   "https://min-api.cryptocompare.com/data/v2/news/?lang=EN";
 
 /** 테스트용: 한 번에 처리할 최대 뉴스 건수 */
-const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 50;
+const MAX_NEWS_ITEMS = Number(process.env.MAX_NEWS_ITEMS) || 10;
 
 /** fetchCryptoNews() 반환 타입 */
 export interface NewsItem {
