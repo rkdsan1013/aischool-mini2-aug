@@ -4,7 +4,7 @@ import https from "https";
 
 // 모델 서버 베이스 URL 설정
 const RAW_BASE = (
-  process.env.MODEL_BASE_URL?.trim() || "https://6ccf4f8b38b9.ngrok-free.app"
+  process.env.MODEL_BASE_URL?.trim() || "https://bd0f258b10a2.ngrok-free.app"
 ).replace(/\/+$/, "");
 const BASE_HTTP = RAW_BASE.replace(/^https:\/\//, "http://");
 const MODEL_TIMEOUT_MS = Number(process.env.MODEL_TIMEOUT_MS) || 1_200_000;
