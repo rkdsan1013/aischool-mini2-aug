@@ -98,12 +98,12 @@
 
 - 메인 페이지 : 실시간/최신 뉴스 기사
 
-![image.png](attachment:57ae853a-fb40-4646-b8d1-2e1d4ea65290:image.png)
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/7eb242b4-6c22-4cff-a2b4-3cd1abf6e906" />
 
 - 뉴스 상세 보기 : 기사의 **원문**과 **요약본**을 확인
 
-![image.png](attachment:b202245a-1f0b-4f05-ae79-13d30e63b614:image.png)
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/835a4620-c379-41d9-95ba-b98f9321eb02" />
 
 - 챗봇 : 투자 긍/부정 판단
 
-![image.png](attachment:04e78e56-a4dd-4051-a817-6e430d4f0db1:image.png)
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/cea540b7-8775-4aaa-af64-0436f05f199a" />
