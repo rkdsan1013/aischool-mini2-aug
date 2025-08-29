@@ -1,6 +1,7 @@
 # aischool-mini2-aug
 
-![image.png](attachment:46cf354f-3ee9-4cee-8093-0d71c96f0699:image.png)
+<img width="1056" height="302" alt="image (1)" src="https://github.com/user-attachments/assets/ab8858e1-b71c-401e-a91d-2174833686cd" />
+
 
 # **🪙 CoinAdvisor(코인 어드바이저)**
 
