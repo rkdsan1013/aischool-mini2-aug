@@ -72,11 +72,13 @@
 
 | **영역** | **사용 기술 및 도구** |
 | --- | --- |
-| 프론트엔드 | React, Tailwind, Vite |
-| 백엔드 | Node.js (Express) |
-| 데이터베이스 | PstgreSQL + Pgvector |
-| 데이터 수집 | CryptoCompare API |
-| AI/NLP | Python, Transformers (HuggingFace), PyTorch |
+| **프론트엔드** | Vite, React, Tailwind |
+| **백엔드** | Node.js, Express, FastAPI, Uvicorn |
+| **데이터베이스** | PostgreSQL + Pgvector |
+| **데이터 수집** | CryptoCompare API |
+| **AI** | Python, PyTorch, Transformers, Sentence-Transformers |
+| **모델** | `unsloth/gpt-oss-20b` (메인 LLM), `paraphrase-multilingual-mpnet-base-v2` (다국어 임베딩), `wing4/llama3-8b-sentiment-analyzer` (감성 분석) |
+| **인프라/배포** | ngrok |
 
 ---
 
