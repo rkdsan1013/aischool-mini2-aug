@@ -98,12 +98,15 @@
 
 - 메인 페이지 : 실시간/최신 뉴스 기사
 
-![image.png](attachment:57ae853a-fb40-4646-b8d1-2e1d4ea65290:image.png)
+<img width="1920" height="1080" alt="KakaoTalk_20250827_111322020" src="https://github.com/user-attachments/assets/61384ebf-1389-40b2-ac10-27351a62a2ed" />
+
 
 - 뉴스 상세 보기 : 기사의 **원문**과 **요약본**을 확인
 
-![image.png](attachment:b202245a-1f0b-4f05-ae79-13d30e63b614:image.png)
+<img width="1920" height="1080" alt="KakaoTalk_20250827_111323703" src="https://github.com/user-attachments/assets/5a71dbd0-a9d8-42dc-af46-6715accd42df" />
+
 
 - 챗봇 : 투자 긍/부정 판단
 
-![image.png](attachment:04e78e56-a4dd-4051-a817-6e430d4f0db1:image.png)
+<img width="1920" height="1080" alt="KakaoTalk_20250827_111325082" src="https://github.com/user-attachments/assets/38020eb2-f8b8-4f0e-b4ed-4464a4affebb" />
+
